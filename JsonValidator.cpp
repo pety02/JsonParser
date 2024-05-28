@@ -1,13 +1,13 @@
 #include "JsonValidator.h"
 
-bool JsonValidator::validateSimpleBraces(std::string json) const
+bool JsonValidator::validateSimpleBraces(const std::string& json) const
 {
     std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
     {
-        if (json[i] == '(' || json[i] == ')')
+        if (i == 0 && (json[i] == '(' || json[i] == ')'))
         {
             firstBrace = json[i];
             if (firstBrace == ')')
@@ -27,14 +27,14 @@ bool JsonValidator::validateSimpleBraces(std::string json) const
 
     return braces.size() == 0;
 }
-bool JsonValidator::validateCurlyBraces(std::string json) const
+bool JsonValidator::validateCurlyBraces(const std::string& json) const 
 {
     std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
     {
-        if (json[i] == '{' || json[i] == '}')
+        if (i == 0 && (json[i] == '{' || json[i] == '}'))
         {
             firstBrace = json[i];
             if (firstBrace == '}')
@@ -54,14 +54,14 @@ bool JsonValidator::validateCurlyBraces(std::string json) const
 
     return braces.size() == 0;
 }
-bool JsonValidator::validateStraightBraces(std::string json) const
+bool JsonValidator::validateStraightBraces(const std::string& json) const
 {
     std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
     {
-        if (json[i] == '[' || json[i] == ']')
+        if (i == 0 && (json[i] == '[' || json[i] == ']'))
         {
             firstBrace = json[i];
             if (firstBrace == ']')
@@ -81,7 +81,7 @@ bool JsonValidator::validateStraightBraces(std::string json) const
 
     return braces.size() == 0;
 }
-bool JsonValidator::validateBraces(std::string json, BracesType braceType) const
+bool JsonValidator::validateBraces(const std::string& json, BracesType braceType) const 
 {
     switch (braceType)
     {
@@ -103,11 +103,11 @@ bool JsonValidator::validateBraces(std::string json, BracesType braceType) const
     }
     }
 }
-bool JsonValidator::isDigit(char c) const
+bool JsonValidator::isDigit(char c) const 
 {
     return '0' <= c && c <= '9';
 }
-bool JsonValidator::isInteger(std::string json) const
+bool JsonValidator::isInteger(const std::string& json) const 
 {
     if (json.empty())
     {
@@ -124,7 +124,7 @@ bool JsonValidator::isInteger(std::string json) const
 
     return true;
 }
-bool JsonValidator::isFloatingPoint(std::string json) const
+bool JsonValidator::isFloatingPoint(const std::string& json) const 
 {
     if (json.empty())
     {
@@ -146,7 +146,7 @@ bool JsonValidator::isFloatingPoint(std::string json) const
 
     return true;
 }
-bool JsonValidator::isIntegersArray(std::string json) const
+bool JsonValidator::isIntegersArray(const std::string& json) const 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
@@ -181,7 +181,7 @@ bool JsonValidator::isIntegersArray(std::string json) const
 
     return true;
 }
-bool JsonValidator::isFloatingPointsArray(std::string json) const
+bool JsonValidator::isFloatingPointsArray(const std::string& json) const 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
@@ -216,11 +216,11 @@ bool JsonValidator::isFloatingPointsArray(std::string json) const
 
     return true;
 }
-bool JsonValidator::isNumbersArray(std::string json) const
+bool JsonValidator::isNumbersArray(const std::string& json) const 
 {
     return this->isIntegersArray(json) || this->isFloatingPointsArray(json);
 }
-bool JsonValidator::isStringsArray(std::string json) const
+bool JsonValidator::isStringsArray(const std::string& json) const 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
@@ -255,7 +255,7 @@ bool JsonValidator::isStringsArray(std::string json) const
 
     return true;
 }
-bool JsonValidator::isBooleansArray(std::string json) const
+bool JsonValidator::isBooleansArray(const std::string& json) const 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
@@ -290,11 +290,17 @@ bool JsonValidator::isBooleansArray(std::string json) const
 
     return true;
 }
-bool JsonValidator::isObject(std::string json) const
+bool JsonValidator::isObject(const std::string& json) const 
 {
-    return false;
+    bool a = this->validateAllBraces(json);
+    bool b = this->validateKeys(json);
+    bool c = this->validateKeyValueSeparators(json); 
+    //bool d = this->validateValues(json);
+    bool e = this->validateCommas(json);
+
+    return a && b && c && e;
 }
-bool JsonValidator::isObjectsArray(std::string json) const
+bool JsonValidator::isObjectsArray(const std::string& json) const 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
@@ -325,23 +331,166 @@ bool JsonValidator::isObjectsArray(std::string json) const
 
     return true;
 }
-bool JsonValidator::validateAllBraces(std::string json) const
+// TODO: not to skip spaces in a key or in a value
+std::string& JsonValidator::skipWhiteSpaces(const std::string& json, std::string& newJson) const
 {
-    return this->validateBraces(json, BracesType::SIMPLE) && this->validateBraces(json, BracesType::CURLY) && this->validateBraces(json, BracesType::STRAIGHT);
+    int index = 0;
+    for(int i = 0; i < json.length(); ++i) {
+        if(json[i] == ' ') {
+            newJson[index++] = json[i++];
+            continue;
+        }
+
+        newJson[index++] = json[i];
+    }
+
+    return newJson;
 }
-bool JsonValidator::isArray(std::string json) const
+bool JsonValidator::validateAllBraces(const std::string& json) const 
+{
+    bool a = this->validateBraces(json, BracesType::SIMPLE);
+    bool b = this->validateBraces(json, BracesType::CURLY);
+    bool c = this->validateBraces(json, BracesType::STRAIGHT);
+
+    return a && b && c;
+}
+bool JsonValidator::isArray(const std::string& json) const 
 {
     return this->isNumbersArray(json) || this->isStringsArray(json) || this->isBooleansArray(json) || this->isObjectsArray(json);
 }
-bool JsonValidator::validateKeys(std::string) const
+// TODO: to think for better decision.
+bool JsonValidator::validateKeys(const std::string& json) const 
 {
-    return false;
+    if (json.empty())
+    {
+        return true;
+    }
+
+    bool isValid = true;
+    std::string newJson = json;
+    for (unsigned int i = 1; i < newJson.length() - 1;)
+    {
+        if (newJson[i] == '{' || newJson[i] == ' ' || newJson[i] == ',' || newJson[i] == '\n' 
+            || newJson[i] == '}' || newJson[i] == '[' || newJson[i] == ']')
+        {
+            i++;
+            continue;
+        }
+        else if (newJson[i] == '\"')
+        {
+            while (newJson[i] != '\"')
+            {
+                i++;
+            }
+            std::string key = "" + newJson[i];
+            do
+            {
+                if (newJson[i] == '\"' && newJson[i + 1] == ':')
+                {
+                    return true;
+                } else {
+                    isValid = false;
+                    key += newJson[i++];
+                }
+            } while (newJson[i] != ':');
+            unsigned int keySize = key.length();
+            if (key[0] != '\"' || key[keySize - 1] != '\"')
+            {
+                return false;
+            }
+            while (newJson[i] != '\n')
+            {
+                i++;
+            }
+            key = "";
+        }
+        else
+        {
+            i++;
+            continue;
+        }
+    }
+
+    return isValid;
 }
-bool JsonValidator::validateCommas(std::string) const
+// TODO: to think fo better decision
+bool JsonValidator::validateValues(const std::string& json) const 
 {
-    return false;
+    if (json.empty())
+    {
+        return true;
+    }
+
+    std::string newJson = json;
+    for (unsigned int i = 1; i < json.length() - 1;)
+    {
+        if (newJson[i] = '{' || newJson[i] == ' ' || newJson[i] == ',' || newJson[i] == '}' || newJson[i] == '[' || newJson[i] == ']')
+        {
+            continue;
+        }
+        else if (newJson[i] == '\"')
+        {
+            while (newJson[i] != '\"')
+            {
+                i++;
+            }
+            std::string key = "";
+            do
+            {
+                if (newJson[i] == '\0')
+                {
+                    break;
+                }
+                if (newJson[i] == '\"' && newJson[i + 1] != ':')
+                {
+                    return false;
+                }
+                i++;
+            } while (newJson[i] != ':');
+            while (newJson[i] == ' ')
+            {
+                i++;
+            }
+            do
+            {
+                if (newJson[i] == '\0')
+                {
+                    break;
+                }
+                key += newJson[i++];
+            } while (newJson[i] != ',' && newJson[i + 1] != '\n');
+            unsigned int keySize = key.length();
+            if (this->isInteger(key) || this->isFloatingPoint(json) || this->isObject(key) || key == "null" || key == "true" || key == "false" || (key[0] == '\"' && key[keySize - 1] == '\"'))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    return true;
 }
-bool JsonValidator::validateValues(std::string) const
-{
-    return false;
+bool JsonValidator::validateCommas(const std::string& json) const {
+    std::string newJson = "";
+    std::string skippedWhiteSpaces = this->skipWhiteSpaces(json, newJson);
+    for(unsigned int i = 1; i < skippedWhiteSpaces.length(); ++i) {
+        if((skippedWhiteSpaces[i - 1] == ',' && skippedWhiteSpaces[i] != '\n')
+            || (skippedWhiteSpaces[i - 1] != ',' && skippedWhiteSpaces[i] == '\n')) {
+            return false;
+        }
+    }
+    return true;
+}
+bool JsonValidator::validateKeyValueSeparators(const std::string& json) const {
+    std::string newJson = "";
+    std::string skippedWhiteSpaces = this->skipWhiteSpaces(json, newJson);
+    for(unsigned int i = 1; i < skippedWhiteSpaces.length(); ++i) {
+        if(skippedWhiteSpaces[i - 1] != '\"' && skippedWhiteSpaces[i] == ':') {
+            return false;
+        }
+    }
+    return true;
 }

@@ -17,7 +17,54 @@ void JsonObject::destroy()
     delete this->next;
     this->children.clear();
 }
-JsonObject::JsonObject(JsonValueType type, std::string key, std::string value, JsonObject *next)
+// TODO: to think how to implement it recursivelly.
+JsonObject::JsonObject(const std::string& json)
+{
+    JsonValidator jv = JsonValidator();
+    std::string key, value, read;
+    for(unsigned int i = 1; i < json.length();) {
+        do {
+            read += json[i++];
+        } while (json[i] != '\"');
+        read = json[i];
+        do {
+            read += json[i++];
+        } while (json[i] != ':');
+        this->key = read.substr(1, read.length() - 1);
+        read = "";
+        do {
+            read += json[i++];
+        } while (json[i] != '\"');
+        read = json[i];
+        do {
+            read += json[i++];
+        } while (json[i] != ',' && json[i] != '\n');
+        this->value = read.substr(1, read.length() - 1);
+        if(jv.isObject(this->value) && this->value != "null") {
+            this->valueType = JsonValueType::OBJECT;
+        } else if (jv.isNumbersArray(this->value) || jv.isBooleansArray(this->value) || jv.isStringsArray(this->value)) {
+            this->valueType = JsonValueType::VALUE_ARRAY;
+        } else if (jv.isObjectsArray(this->value)) {
+            this->valueType = JsonValueType::OBJECT_ARRAY;
+        } else if (jv.isInteger(this->value)) {
+            this->valueType = JsonValueType::INT;
+        } else if (jv.isFloatingPoint(this->value)) {
+            this->valueType = JsonValueType::DOUBLE;
+        } else if (this->value == "true" || this->value == "false") {
+            this->valueType = JsonValueType::BOOLEAN;
+        } else if (this->value == "null") {
+            this->valueType = JsonValueType::NULL_VALUE;
+        } else {
+            this->valueType = JsonValueType::STRING;
+        }
+        if(json[i] == '\n') {
+            this->next == nullptr;
+        } else {
+            this->next = new JsonObject(json.substr(i, json.length()));
+        }
+    }
+}
+JsonObject::JsonObject(JsonValueType type, const std::string &key, const std::string &value, JsonObject *next)
     : valueType(type), key(key), value(value), next(next), children(std::vector<JsonObject *>())
 {
 }

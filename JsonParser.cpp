@@ -1,19 +1,31 @@
 #include "JsonParser.h"
 
-void JsonParser::copy(const JsonParser &other)
+void JsonParser::copy(const JsonParser& other)
 {
     this->root = other.root;
     this->validator = other.validator;
+    this->capacity = other.capacity;
+    this->size = other.size;
 }
 void JsonParser::destroy()
 {
     delete this->root;
 }
+void JsonParser::resize()
+{
+    JsonObject* tempData = new JsonObject[this->capacity];
+    for(unsigned int i = 0; i < this->size; ++i) {
+        tempData[i] = this->root[i];
+    }
+    delete[] this->root;
+    this->capacity *= 2;
+    this->root = tempData;
+}
 int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     return root.getKey().length() + 3;
 }
-void JsonParser::printNode(JsonObject *root, int &whiteSpaces) const
+void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
 {
     if (root == nullptr)
     {
@@ -72,16 +84,18 @@ void JsonParser::printNode(JsonObject *root, int &whiteSpaces) const
     std::cout << "," << std::endl;
     this->printNode(root->getNext(), whiteSpaces);
 }
-JsonParser::JsonParser(const JsonObject &root)
+JsonParser::JsonParser(const JsonObject& root)
 {
     this->root = new JsonObject(root);
     this->validator = JsonValidator();
+    this->capacity = 8;
+    this->size = 0;
 }
-JsonParser::JsonParser(const JsonParser &other)
+JsonParser::JsonParser(const JsonParser& other)
 {
     this->copy(other);
 }
-JsonParser &JsonParser::operator=(const JsonParser &other)
+JsonParser &JsonParser::operator=(const JsonParser& other)
 {
     if (this != &other)
     {
@@ -95,15 +109,11 @@ JsonParser::~JsonParser()
 {
     this->destroy();
 }
-bool JsonParser::validate(std::string json) const
+bool JsonParser::validate(const std::string& json) const
 {
     if (!this->validator.validateAllBraces(json))
     {
         throw std::runtime_error("Braces error: Please, check all opening and closing braces!");
-    }
-    if (!this->validator.validateCommas(json))
-    {
-        throw std::runtime_error("Commas error: Please, check all commas! In JSON format you shoul write comma in the end of each line.");
     }
     if (!this->validator.validateKeys(json))
     {
@@ -113,6 +123,14 @@ bool JsonParser::validate(std::string json) const
     {
         throw std::runtime_error("Values error: Please, check all your values syntax! Numbers, booleans and null values should be written without inverted commas. Arrays should be written in [] and all element should be separated by a comma. Strings should be written in inverted commas.");
     }
+    if(!this->validator.validateKeyValueSeparators(json)) {
+        throw std::runtime_error("Key Value pair separators error: Please, check if all key value pair separators are put on the right place!");
+    }
+    if(!this->validator.validateCommas(json)) {
+        throw std::runtime_error("Commas error: Please, check if all key value pairs are written on the next line, separated by a comma!");
+    }
+
+    return true;
 }
 void JsonParser::print() const
 {
@@ -121,4 +139,37 @@ void JsonParser::print() const
     this->printNode(this->root, whiteSpaces);
     std::cout << std::endl
               << "}";
+}
+std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
+{
+    std::vector<JsonObject*> values = std::vector<JsonObject*>();
+    for(unsigned int i = 0; i < this->size; ++i) {
+        if(this->root[i].getKey() == key) {
+            values.push_back(new JsonObject(this->root[i].getValue()));
+        }
+    }
+
+    return values;
+}
+bool JsonParser::contains(const std::string& value) const
+{
+    return false;
+}
+void JsonParser::setTo(const std::string& path, const std::string& json)
+{
+}
+void JsonParser::createPath(const std::string& path, const std::string& json)
+{
+}
+void JsonParser::deletePath(const std::string& path)
+{
+}
+void JsonParser::move(const std::string& fromPath, std::string& toPath)
+{
+}
+void JsonParser::save(const std::string& path) const
+{
+}
+void JsonParser::saveAs(const std::string& filename, const std::string& path) const
+{
 }
