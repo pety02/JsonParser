@@ -19,7 +19,7 @@ int main()
     std::string js = "{\n      \"name\": \"Petya Licheva\",\n           \"age\":       21\n}";
     std::string* ns = new std::string("");
     ns = &v.skipWhiteSpaces(js);
-    std::cout << *ns;
+    std::cout << std::boolalpha << v.validateKeys(js);
     
     return 0;
 }

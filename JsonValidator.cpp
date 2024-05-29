@@ -369,7 +369,6 @@ bool JsonValidator::isArray(const std::string& json) const
 {
     return this->isNumbersArray(json) || this->isStringsArray(json) || this->isBooleansArray(json) || this->isObjectsArray(json);
 }
-// TODO: to think for better decision.
 bool JsonValidator::validateKeys(const std::string& json) const 
 {
     if (json.empty())
@@ -377,48 +376,38 @@ bool JsonValidator::validateKeys(const std::string& json) const
         return true;
     }
 
-    bool isValid = true;
+    bool isValid = false;
     std::string newJson = json;
-    for (unsigned int i = 1; i < newJson.length() - 1;)
+    std::string key = "";
+    for (unsigned int i = 0; i < newJson.length();)
     {
         if (newJson[i] == '{' || newJson[i] == ' ' || newJson[i] == ',' || newJson[i] == '\n' 
             || newJson[i] == '}' || newJson[i] == '[' || newJson[i] == ']')
         {
             i++;
-            continue;
         }
         else if (newJson[i] == '\"')
         {
-            while (newJson[i] != '\"')
-            {
-                i++;
-            }
-            std::string key = "" + newJson[i];
             do
             {
-                if (newJson[i] == '\"' && newJson[i + 1] == ':')
-                {
-                    return true;
-                } else {
-                    isValid = false;
-                    key += newJson[i++];
-                }
+                key += newJson[i++];
             } while (newJson[i] != ':');
-            unsigned int keySize = key.length();
-            if (key[0] != '\"' || key[keySize - 1] != '\"')
-            {
+            
+            if(key[0] == '\"' && key[key.length() - 1] == '\"') {
+                isValid = true;
+            } else {
+                isValid = false;
                 return false;
             }
-            while (newJson[i] != '\n')
-            {
-                i++;
-            }
             key = "";
+            do {
+                i++;
+            } while(newJson[i] != '\n');
         }
         else
         {
-            i++;
-            continue;
+            isValid = false;
+            return false;
         }
     }
 
