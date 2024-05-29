@@ -78,7 +78,7 @@ public:
     /// @param json a string in which should be skipped whitespaces
     /// @param newJson the new string in which should store the json string with the skipped whitespaces
     /// @return the newJson string
-    std::string& skipWhiteSpaces(const std::string&, std::string&) const;
+    std::string& skipWhiteSpaces(const std::string&) const;
     /// @brief validates that all braces are put correctly
     /// @param json a string to be validated
     /// @return true if all braces are opened and closed correctly and false in the other cases

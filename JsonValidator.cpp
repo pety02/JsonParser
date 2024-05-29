@@ -331,19 +331,30 @@ bool JsonValidator::isObjectsArray(const std::string& json) const
 
     return true;
 }
-// TODO: not to skip spaces in a key or in a value
-std::string& JsonValidator::skipWhiteSpaces(const std::string& json, std::string& newJson) const
+std::string& JsonValidator::skipWhiteSpaces(const std::string& json) const
 {
+    std::string& newJson = *new std::string("");
+    int invertedCommasCount = 0;
+    bool canBeSkipped = true;
     int index = 0;
-    for(int i = 0; i < json.length(); ++i) {
-        if(json[i] == ' ') {
-            newJson[index++] = json[i++];
+    for(int i = 0; i < json.length() - 1;) {
+        if(json[i] == '\"' && invertedCommasCount == 0) {
+            canBeSkipped = false;
+            invertedCommasCount++;
+            i++;
+            continue;
+        } else if(json[i] == '\"' && invertedCommasCount > 0) {
+            canBeSkipped = true;
+            invertedCommasCount = 0;
+        } 
+        if(json[i] == ' ' && canBeSkipped) {
+            i++;
             continue;
         }
 
-        newJson[index++] = json[i];
+        newJson += json[i++];
     }
-
+    newJson += json[json.length() - 1];
     return newJson;
 }
 bool JsonValidator::validateAllBraces(const std::string& json) const 
@@ -474,23 +485,23 @@ bool JsonValidator::validateValues(const std::string& json) const
     return true;
 }
 bool JsonValidator::validateCommas(const std::string& json) const {
-    std::string newJson = "";
+    /*std::string newJson = "";
     std::string skippedWhiteSpaces = this->skipWhiteSpaces(json, newJson);
     for(unsigned int i = 1; i < skippedWhiteSpaces.length(); ++i) {
         if((skippedWhiteSpaces[i - 1] == ',' && skippedWhiteSpaces[i] != '\n')
             || (skippedWhiteSpaces[i - 1] != ',' && skippedWhiteSpaces[i] == '\n')) {
             return false;
         }
-    }
+    }*/
     return true;
 }
 bool JsonValidator::validateKeyValueSeparators(const std::string& json) const {
-    std::string newJson = "";
+    /*std::string newJson = "";
     std::string skippedWhiteSpaces = this->skipWhiteSpaces(json, newJson);
     for(unsigned int i = 1; i < skippedWhiteSpaces.length(); ++i) {
         if(skippedWhiteSpaces[i - 1] != '\"' && skippedWhiteSpaces[i] == ':') {
             return false;
         }
-    }
+    }*/
     return true;
 }
