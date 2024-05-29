@@ -6,13 +6,15 @@
 #include <stdexcept>
 #include <exception>
 #include "JsonObject.h"
+
+/// @brief a class that descibes a json parser
 class JsonParser final
 {
 private:
     JsonObject *root;
-    JsonValidator validator;
     unsigned int capacity;
     unsigned int size;
+    JsonValidator validator;
  
     void copy(const JsonParser&);
     void destroy();
@@ -23,32 +25,32 @@ private:
     void printNode(JsonObject*, int&) const;
 
 public:
-    /// @brief 
-    /// @param  
+    /// @brief Constructor with a parameter
+    /// @param root an object to be set as root of the json objects array
     JsonParser(const JsonObject&);
-    /// @brief 
-    /// @param  
+    /// @brief Copy constructor
+    /// @param other an object to be copied  
     JsonParser(const JsonParser&);
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief Operator=
+    /// @param other an object to be assigned
+    /// @return a reference to this object
     JsonParser &operator=(const JsonParser&);
-    /// @brief 
+    /// @brief Destructor
     ~JsonParser();
 
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief checks if a string is a valid json  
+    /// @param json a string to be checked
+    /// @return true if the string is a valid json and false in the other cases
     bool validate(const std::string&) const;
-    /// @brief 
+    /// @brief prints a string in json format
     void print() const;
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief searches all json objects in the json objects array by a definite key 
+    /// @param key the key to search
+    /// @return a vector of JsonObject pointers
     std::vector<JsonObject*> searchBy(const std::string&) const;
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief checks if json objects array contains a definite value 
+    /// @param value the value to be checked
+    /// @return true if the json objects array contains this value and false in the other cases
     bool contains(const std::string&) const;
     /// @brief 
     /// @param  
