@@ -12,13 +12,10 @@ class JsonParser final
 {
 private:
     JsonObject *root;
-    unsigned int capacity;
-    unsigned int size;
     JsonValidator validator;
  
     void copy(const JsonParser&);
     void destroy();
-    void resize();
     JsonParser() = default;
 
     int countWhitespaces(const JsonObject&) const;

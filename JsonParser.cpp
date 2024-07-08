@@ -4,22 +4,10 @@ void JsonParser::copy(const JsonParser& other)
 {
     this->root = other.root;
     this->validator = other.validator;
-    this->capacity = other.capacity;
-    this->size = other.size;
 }
 void JsonParser::destroy()
 {
     delete this->root;
-}
-void JsonParser::resize()
-{
-    JsonObject* tempData = new JsonObject[this->capacity];
-    for(unsigned int i = 0; i < this->size; ++i) {
-        tempData[i] = this->root[i];
-    }
-    delete[] this->root;
-    this->capacity *= 2;
-    this->root = tempData;
 }
 int JsonParser::countWhitespaces(const JsonObject &root) const
 {
@@ -88,8 +76,6 @@ JsonParser::JsonParser(const JsonObject& root)
 {
     this->root = new JsonObject(root);
     this->validator = JsonValidator();
-    this->capacity = 8;
-    this->size = 0;
 }
 JsonParser::JsonParser(const JsonParser& other)
 {
@@ -143,9 +129,9 @@ void JsonParser::print() const
 std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 {
     std::vector<JsonObject*> values = std::vector<JsonObject*>();
-    for(unsigned int i = 0; i < this->size; ++i) {
-        if(this->root[i].getKey() == key) {
-            values.push_back(new JsonObject(this->root[i].getValue()));
+    while(this->root->getNext()) {
+        if(this->root->getKey() == key) {
+            values.push_back(new JsonObject(this->root->getValue()));
         }
     }
 

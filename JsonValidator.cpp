@@ -336,8 +336,7 @@ std::string& JsonValidator::skipWhiteSpaces(const std::string& json) const
     std::string& newJson = *new std::string("");
     int invertedCommasCount = 0;
     bool canBeSkipped = true;
-    int index = 0;
-    for(int i = 0; i < json.length() - 1;) {
+    for(size_t i = 0; i < json.length() - 1;) {
         if(json[i] == '\"' && invertedCommasCount == 0) {
             canBeSkipped = false;
             invertedCommasCount++;
@@ -424,7 +423,7 @@ bool JsonValidator::validateValues(const std::string& json) const
     std::string newJson = json;
     for (unsigned int i = 1; i < json.length() - 1;)
     {
-        if (newJson[i] = '{' || newJson[i] == ' ' || newJson[i] == ',' || newJson[i] == '}' || newJson[i] == '[' || newJson[i] == ']')
+        if (newJson[i] == '{' || newJson[i] == ' ' || newJson[i] == ',' || newJson[i] == '}' || newJson[i] == '[' || newJson[i] == ']')
         {
             continue;
         }

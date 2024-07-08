@@ -17,8 +17,8 @@ int main()
 
     JsonValidator v = JsonValidator();
     std::string js = "{\n      \"name\": \"Petya Licheva\",\n           \"age\":       21\n}";
-    std::string* ns = new std::string("");
-    ns = &v.skipWhiteSpaces(js);
+    /*std::string* ns = new std::string("");
+    ns = &v.skipWhiteSpaces(js);*/
     std::cout << std::boolalpha << v.validateKeys(js);
     
     return 0;

@@ -58,7 +58,7 @@ JsonObject::JsonObject(const std::string& json)
             this->valueType = JsonValueType::STRING;
         }
         if(json[i] == '\n') {
-            this->next == nullptr;
+            this->next = nullptr;
         } else {
             this->next = new JsonObject(json.substr(i, json.length()));
         }
