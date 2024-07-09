@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <exception>
+#include <sstream>
 #include "JsonObject.h"
 
 /// @brief a class that descibes a json parser
@@ -19,6 +20,7 @@ private:
     JsonParser() = default;
 
     int countWhitespaces(const JsonObject&) const;
+    std::pair<JsonObject*, JsonObject*> findNodeAndParent(const std::string& path);
     void printNode(JsonObject*, int&) const;
 
 public:
@@ -56,7 +58,7 @@ public:
     /// @brief 
     /// @param  
     /// @param  
-    void createPath(const std::string&, const std::string&);
+    void createPath(const std::string&);
     /// @brief 
     /// @param  
     void deletePath(const std::string&);

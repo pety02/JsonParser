@@ -13,6 +13,28 @@ int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     return root.getKey().length() + 3;
 }
+std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
+        std::stringstream ss(path);
+        std::string key;
+        JsonObject* parent = nullptr;
+        JsonObject* current = root;
+
+        while (std::getline(ss, key, '/')) {
+            bool found = false;
+            for (JsonObject* child : current->getChildren()) {
+                if (child->getKey() == key) {
+                    parent = current;
+                    current = child;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return {nullptr, nullptr}; // Path does not exist
+            }
+        }
+        return {current, parent};
+    }
 void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
 {
     if (root == nullptr)
@@ -129,29 +151,98 @@ void JsonParser::print() const
 std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 {
     std::vector<JsonObject*> values = std::vector<JsonObject*>();
-    while(this->root->getNext()) {
+    JsonObject* temp = this->root;
+    while(temp->getNext()) {
         if(this->root->getKey() == key) {
             values.push_back(new JsonObject(this->root->getValue()));
         }
+        temp->setNext(*root->getNext());
     }
 
     return values;
 }
 bool JsonParser::contains(const std::string& value) const
 {
+    JsonObject* obj = new JsonObject(value);
+    JsonObject* temp = this->root;
+    while(temp->getNext()) {
+        if(this->root == obj) {
+            return true;
+        }
+        temp->setNext(*this->root->getNext());
+    }
     return false;
 }
 void JsonParser::setTo(const std::string& path, const std::string& json)
 {
+    JsonObject* temp = this->root;
+    JsonObject* pathJsonObj = new JsonObject(path);
+    JsonObject* newJsonObj = new JsonObject(json);
+    while(temp->getNext()) {
+        if(temp == pathJsonObj) {
+            newJsonObj->setNext(*temp->getNext());
+            pathJsonObj->setNext(*newJsonObj);
+            temp->setNext(*pathJsonObj);
+            break;
+        }
+        temp->setNext(*temp->getNext());
+    }
 }
-void JsonParser::createPath(const std::string& path, const std::string& json)
+void JsonParser::createPath(const std::string& json)
 {
+    JsonObject* newJsonObj = new JsonObject(json);
+    this->root->setNext(*newJsonObj);
 }
 void JsonParser::deletePath(const std::string& path)
 {
+    JsonObject* temp = this->root;
+    JsonObject* pathJsonObj = new JsonObject(path);
+    while(temp->getNext()) {
+        if(temp == pathJsonObj) {
+            JsonObject* toBeDeleted = temp->getNext();
+            temp->setNext(*toBeDeleted->getNext());
+            delete toBeDeleted;
+            break;
+        }
+        temp->setNext(*this->root->getNext());
+    }
 }
 void JsonParser::move(const std::string& fromPath, std::string& toPath)
 {
+    auto [fromNode, fromParent] = findNodeAndParent(fromPath);
+        auto [toNode, toParent] = findNodeAndParent(toPath);
+
+        if (!fromNode || !toNode) {
+            std::cerr << "Invalid path(s)" << std::endl;
+            return;
+        }
+
+        // Swapping the nodes by adjusting the next pointers
+        JsonObject* fromNext = fromNode->getNext();
+        JsonObject* toNext = toNode->getNext();
+
+        // If fromNode or toNode are direct children of their parents, adjust their parents' child pointers
+        if (fromParent) {
+            for (JsonObject*& child : fromParent->getChildren()) {
+                if (child == fromNode) {
+                    child = toNode;
+                    break;
+                }
+            }
+        }
+
+        if (toParent) {
+            for (JsonObject*& child : toParent->getChildren()) {
+                if (child == toNode) {
+                    child = fromNode;
+                    break;
+                }
+            }
+        }
+
+        // Set the next pointers
+        fromNode->setNext(*toNext);
+        toNode->setNext(*fromNext);
 }
 void JsonParser::save(const std::string& path) const
 {
