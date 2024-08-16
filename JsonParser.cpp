@@ -131,11 +131,8 @@ bool JsonParser::validate(const std::string& json) const
     {
         throw std::runtime_error("Values error: Please, check all your values syntax! Numbers, booleans and null values should be written without inverted commas. Arrays should be written in [] and all element should be separated by a comma. Strings should be written in inverted commas.");
     }
-    if(!this->validator.validateKeyValueSeparators(json)) {
+    if(!this->validator.validateSeparators(json)) {
         throw std::runtime_error("Key Value pair separators error: Please, check if all key value pair separators are put on the right place!");
-    }
-    if(!this->validator.validateCommas(json)) {
-        throw std::runtime_error("Commas error: Please, check if all key value pairs are written on the next line, separated by a comma!");
     }
 
     return true;

@@ -6,6 +6,8 @@
 #include <string>
 #include <cstring>
 
+class JsonParser;
+
 /// @brief a class that validates json objects
 class JsonValidator final
 {
@@ -16,7 +18,7 @@ private:
         CURLY,
         STRAIGHT
     };
-public:
+
     /// @brief validates if all simple bracces are put correctly
     /// @param json text
     /// @return true if all simple braces are correctly opened and closed and false in the other cases
@@ -66,10 +68,6 @@ public:
     /// @param json a string to be checked
     /// @return true if the text represents a booleans array
     bool isBooleansArray(const std::string&) const;
-    /// @brief check if a string represents an object 
-    /// @param json a string to be checked
-    /// @return true if the text represents an objectn 
-    bool isObject(const std::string&) const;
     /// @brief check if a string represents an objects array 
     /// @param json a string to be checked
     /// @return true if the text represents an objects array 
@@ -95,14 +93,19 @@ public:
     /// @param json a string to be validated
     /// @return true if all values are written correctly and false in the other cases
     bool validateValues(const std::string&) const;
-    /// @brief validates that all commas are correctly written as separators of key value pairs
-    /// @param json a string to be validated
-    /// @return true if all commas are written correctly and false in the other cases
-    bool validateCommas(const std::string&) const;
     /// @brief validates that all separators of keys and values are correctly written
     /// @param json a string to be validated
     /// @return true if all separators of keys and values are correctly written and false in the other cases
-    bool validateKeyValueSeparators(const std::string&) const;
+    bool validateSeparators(const std::string&) const;
+
+    friend class JsonObject;
+    friend class JsonParser;
+
+public:
+    /// @brief check if a string represents an object 
+    /// @param json a string to be checked
+    /// @return true if the text represents an objectn 
+    bool isObject(const std::string&) const;
 };
 
 #endif

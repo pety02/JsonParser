@@ -16,10 +16,10 @@ int main()
     jp.print();*/
 
     JsonValidator v = JsonValidator();
-    std::string js = "{\n      \"name\": \"Petya Licheva\",\n           \"age\":       21\n}";
+    std::string js = "{\n\"is\":1,\n\"nm\":\"object\",\n\"something\":{\n\"name\":\"Petya\",\n\"age\":21\n},\n\"price\":5.50,\n\"data\":[1,2,3,4,5]\n}";
     /*std::string* ns = new std::string("");
     ns = &v.skipWhiteSpaces(js);*/
-    std::cout << std::boolalpha << v.validateKeys(js);
+    std::cout << std::boolalpha << v.isObject(js);
     
     return 0;
 }
