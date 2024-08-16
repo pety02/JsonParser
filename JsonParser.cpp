@@ -3,7 +3,6 @@
 void JsonParser::copy(const JsonParser& other)
 {
     this->root = other.root;
-    this->validator = other.validator;
 }
 void JsonParser::destroy()
 {
@@ -97,7 +96,6 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
 JsonParser::JsonParser(const JsonObject& root)
 {
     this->root = new JsonObject(root);
-    this->validator = JsonValidator();
 }
 JsonParser::JsonParser(const JsonParser& other)
 {
@@ -119,19 +117,19 @@ JsonParser::~JsonParser()
 }
 bool JsonParser::validate(const std::string& json) const
 {
-    if (!this->validator.validateAllBraces(json))
+    if (!JsonValidator::validateAllBraces(json))
     {
         throw std::runtime_error("Braces error: Please, check all opening and closing braces!");
     }
-    if (!this->validator.validateKeys(json))
+    if (!JsonValidator::validateKeys(json))
     {
         throw std::runtime_error("Keys error: Please, check if all your keys' values are written in inverted commas!");
     }
-    if (!this->validator.validateValues(json))
+    if (!JsonValidator::validateValues(json))
     {
         throw std::runtime_error("Values error: Please, check all your values syntax! Numbers, booleans and null values should be written without inverted commas. Arrays should be written in [] and all element should be separated by a comma. Strings should be written in inverted commas.");
     }
-    if(!this->validator.validateSeparators(json)) {
+    if(!JsonValidator::validateSeparators(json)) {
         throw std::runtime_error("Key Value pair separators error: Please, check if all key value pair separators are put on the right place!");
     }
 

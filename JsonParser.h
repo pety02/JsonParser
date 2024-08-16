@@ -13,7 +13,6 @@ class JsonParser final
 {
 private:
     JsonObject *root;
-    JsonValidator validator;
  
     void copy(const JsonParser&);
     void destroy();

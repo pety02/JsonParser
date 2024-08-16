@@ -20,7 +20,6 @@ void JsonObject::destroy()
 // TODO: to think how to implement it recursivelly.
 JsonObject::JsonObject(const std::string& json)
 {
-    JsonValidator jv = JsonValidator();
     std::string key, value, read;
     for(unsigned int i = 1; i < json.length();) {
         do {
@@ -40,15 +39,17 @@ JsonObject::JsonObject(const std::string& json)
             read += json[i++];
         } while (json[i] != ',' && json[i] != '\n');
         this->value = read.substr(1, read.length() - 1);
-        if(jv.isObject(this->value) && this->value != "null") {
+        if(JsonValidator::isObject(this->value) && this->value != "null") {
             this->valueType = JsonValueType::OBJECT;
-        } else if (jv.isNumbersArray(this->value) || jv.isBooleansArray(this->value) || jv.isStringsArray(this->value)) {
+        } else if (JsonValidator::isNumbersArray(this->value) 
+                || JsonValidator::isBooleansArray(this->value) 
+                || JsonValidator::isStringsArray(this->value)) {
             this->valueType = JsonValueType::VALUE_ARRAY;
-        } else if (jv.isObjectsArray(this->value)) {
+        } else if (JsonValidator::isObjectsArray(this->value)) {
             this->valueType = JsonValueType::OBJECT_ARRAY;
-        } else if (jv.isInteger(this->value)) {
+        } else if (JsonValidator::isInteger(this->value)) {
             this->valueType = JsonValueType::INT;
-        } else if (jv.isFloatingPoint(this->value)) {
+        } else if (JsonValidator::isFloatingPoint(this->value)) {
             this->valueType = JsonValueType::DOUBLE;
         } else if (this->value == "true" || this->value == "false") {
             this->valueType = JsonValueType::BOOLEAN;
