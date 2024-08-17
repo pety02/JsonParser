@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <stdexcept>
 
 class JsonParser;
 
@@ -53,6 +54,18 @@ private:
     /// @param json definite string to be checked
     /// @return true if the text represents a floating point and false in the other cases
     static bool isFloatingPoint(const std::string&);
+    /// @brief 
+    /// @param  
+    /// @return 
+    static bool isISODateFormat(const std::string&);
+    /// @brief 
+    /// @param  
+    /// @return 
+    static bool isUSADateFormat(const std::string&);
+    /// @brief 
+    /// @param  
+    /// @return 
+    static bool isEURDateFormat(const std::string&);
     /// @brief 
     /// @param  
     /// @return 

@@ -173,25 +173,54 @@ bool JsonValidator::isFloatingPoint(const std::string& json)
     return true;
 }
 
-// TODO: to think for different date formats validation
-bool JsonValidator::isDate(const std::string& json)
+bool JsonValidator::isISODateFormat(const std::string& json)
 {
     if(json[4] != '-' || json[7] != '-') {
         return false;
     }
+    return true;
+}
 
+bool JsonValidator::isUSADateFormat(const std::string& json)
+{
+    if(json[2] != '\\' || json[5] != '\\') {
+        return false;
+    }
+    return true;
+}
+
+bool JsonValidator::isEURDateFormat(const std::string& json)
+{
+    if(json[2] != '.' || json[5] != '.') {
+        return false;
+    }
+    return true;
+}
+
+// TODO: to think for different date formats validation
+bool JsonValidator::isDate(const std::string& json)
+{
     try {
-        int year = std::atoi(json.substr(0, 4).c_str());
+        int year = 0, month = 0, date = 0;
+        if(JsonValidator::isISODateFormat(json)) {
+            year = std::atoi(json.substr(0, 4).c_str());
+            month = std::atoi(json.substr(5,2).c_str());
+            date = std::atoi(json.substr(8,2).c_str());
+        } else if (JsonValidator::isUSADateFormat(json) 
+            || JsonValidator::isEURDateFormat(json)) {
+            year = std::atoi(json.substr(6, 4).c_str());
+            month = std::atoi(json.substr(3,2).c_str());
+            date = std::atoi(json.substr(0,2).c_str());
+        } 
+
         if(year < 1900) {
             return false;
         }
-        int month = std::atoi(json.substr(5,2).c_str());
         if(month < 1 || 12 < month) {
             return false;
         }
-        int date = std::atoi(json.substr(8,2).c_str());
         if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) 
-                && (date < 1 || 31 < date)) { 
+            && (date < 1 || 31 < date)) { 
             return false;
         } else if((month == 4 || month == 6 || month == 9 || month == 11) 
             && (date < 1 || 30 < date)) { 
@@ -206,7 +235,6 @@ bool JsonValidator::isDate(const std::string& json)
                     return false;
                 } 
             }
-            return true;
         }
 
         return true;
@@ -214,14 +242,42 @@ bool JsonValidator::isDate(const std::string& json)
         return false;
     } catch (const std::out_of_range& e) {
         return false;
+    } catch (const std::exception& e) {
+        return false;
     }
-
-    return true;
 }
 
-// TODO: to implment it
-bool JsonValidator::isDatesArray(const std::string &)
+bool JsonValidator::isDatesArray(const std::string& json)
 {
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    std::string readed = "";
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (values[i] == ' ')
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed += values[i++];
+        } while (values[i] != ',');
+        ++i;
+        if (!JsonValidator::isDate(readed))
+        {
+            return false;
+        }
+        readed = "";
+    }
+
     return true;
 }
 
