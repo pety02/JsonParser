@@ -18,9 +18,9 @@ private:
     void destroy();
     JsonParser() = default;
 
-    int countWhitespaces(const JsonObject&, int&) const;
+    int countWhitespaces(const JsonObject&) const;
     std::pair<JsonObject*, JsonObject*> findNodeAndParent(const std::string& path);
-    void printNode(JsonObject*, int&, int&) const;
+    void printNode(JsonObject*, int&) const;
 
 public:
     /// @brief Constructor with a parameter

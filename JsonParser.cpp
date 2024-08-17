@@ -8,15 +8,11 @@ void JsonParser::destroy()
 {
     delete this->root;
 }
-int JsonParser::countWhitespaces(const JsonObject &root, int& initial) const
+int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     int newWhiteSpaces = 0;
-    if(initial == 0) {
-        newWhiteSpaces = initial + root.getKey().length() + 3;
-    } else {
-        newWhiteSpaces += 3;
-    }
-    initial = newWhiteSpaces;
+    newWhiteSpaces = root.getKey().length() + 3;
+    
     return newWhiteSpaces;
 }
 std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
@@ -41,7 +37,7 @@ std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::str
         }
         return {current, parent};
     }
-void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) const
+void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
 {
     if (root == nullptr)
     {
@@ -77,15 +73,15 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) con
         if (root->getType() == JsonValueType::OBJECT)
         {
             std::cout << " \"" << root->getKey() << "\": ";
-            whiteSpaces = this->countWhitespaces(*root->getChildren()[0], initial);
+            whiteSpaces = this->countWhitespaces(*root->getChildren()[0]);
             
             std::string whites = std::string(whiteSpaces + 1, ' ');
             std::cout << std::endl << whites << " {" << std::endl;
-            this->printNode(root->getChildren()[0], whiteSpaces, initial);
-            std::cout << std::endl << " }";
+            this->printNode(root->getChildren()[0], whiteSpaces);
+            std::cout << std::endl << whites << " }";
         } else {
         std::cout << " \"" << root->getKey() << "\": ";
-        whiteSpaces = this->countWhitespaces(*root, initial);
+        whiteSpaces = this->countWhitespaces(*root);
         if (root->getType() == JsonValueType::OBJECT_ARRAY)
         {
             std::string whites = std::string(whiteSpaces + 1, ' ');
@@ -94,9 +90,9 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) con
             std::string newWhites = std::string(whiteSpaces + 1, ' ');
             for (unsigned int i = 0; i < root->getChildren().size(); ++i)
             {
-                whiteSpaces = this->countWhitespaces(*root->getChildren()[i], initial);
+                whiteSpaces = this->countWhitespaces(*root->getChildren()[i]);
                 std::cout << std::endl << newWhites << " {" << std::endl;
-                this->printNode(root->getChildren()[i], whiteSpaces, initial);
+                this->printNode(root->getChildren()[i], whiteSpaces);
                 if(i == root->getChildren().size() - 1) {
                     std::cout << std::endl << newWhites << " }" << std::endl;
                 } else {
@@ -107,7 +103,7 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) con
         }
         else if (root->getType() == JsonValueType::OBJECT)
         {
-            this->printNode(root->getChildren()[0], whiteSpaces, initial);
+            this->printNode(root->getChildren()[0], whiteSpaces);
         }
         }
     }
@@ -118,7 +114,7 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) con
     }
 
     std::cout << "," << std::endl;
-    this->printNode(root->getNext(), whiteSpaces, initial);
+    this->printNode(root->getNext(), whiteSpaces);
 }
 JsonParser::JsonParser(const JsonObject& root)
 {
@@ -169,8 +165,8 @@ bool JsonParser::validate(const std::string& json) const
 void JsonParser::print() const
 {
     std::cout << "{" << std::endl;
-    int whiteSpaces = 0, initial = 0;
-    this->printNode(this->root, whiteSpaces, initial);
+    int whiteSpaces = 0;
+    this->printNode(this->root, whiteSpaces);
     std::cout << std::endl
               << "}";
 }

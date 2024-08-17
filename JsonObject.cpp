@@ -17,7 +17,7 @@ void JsonObject::destroy()
     delete this->next;
     this->children.clear();
 }
-// TODO: to think how to implement it recursivelly.
+
 JsonObject::JsonObject(const std::string& json)
 {
     std::string key, value, read;

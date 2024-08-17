@@ -50,7 +50,7 @@ public:
     /// @param left reference to left object 
     /// @param right reference to right object
     /// @return Compares all fields of left and right objects and returns true if they are not equal and false in the other cases
-    friend bool operator!=(const JsonObject &, const JsonObject &);
+    friend bool operator!=(const JsonObject &, const JsonObject&);
     /// @brief Destructor 
     ~JsonObject();
 
