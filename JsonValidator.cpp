@@ -173,6 +173,58 @@ bool JsonValidator::isFloatingPoint(const std::string& json)
     return true;
 }
 
+// TODO: to think for different date formats validation
+bool JsonValidator::isDate(const std::string& json)
+{
+    if(json[4] != '-' || json[7] != '-') {
+        return false;
+    }
+
+    try {
+        int year = std::atoi(json.substr(0, 4).c_str());
+        if(year < 1900) {
+            return false;
+        }
+        int month = std::atoi(json.substr(5,2).c_str());
+        if(month < 1 || 12 < month) {
+            return false;
+        }
+        int date = std::atoi(json.substr(8,2).c_str());
+        if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) 
+                && (date < 1 || 31 < date)) { 
+            return false;
+        } else if((month == 4 || month == 6 || month == 9 || month == 11) 
+            && (date < 1 || 30 < date)) { 
+            return false;
+        } else {
+            if(year % 4 == 0 || year % 400 == 0) { // leap year
+                if(month == 2 && (date < 1 || 29 < date)) {
+                    return false;
+                } 
+            } else { // not leap year
+                if(month == 2 && (date < 1 || 28 < date)) {
+                    return false;
+                } 
+            }
+            return true;
+        }
+
+        return true;
+    } catch (const std::invalid_argument& e) {
+        return false;
+    } catch (const std::out_of_range& e) {
+        return false;
+    }
+
+    return true;
+}
+
+// TODO: to implment it
+bool JsonValidator::isDatesArray(const std::string &)
+{
+    return true;
+}
+
 bool JsonValidator::isIntegersArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -390,7 +442,8 @@ bool JsonValidator::isArray(const std::string& json)
     return JsonValidator::isNumbersArray(json) 
         || JsonValidator::isStringsArray(json) 
         || JsonValidator::isBooleansArray(json) 
-        || JsonValidator::isObjectsArray(json);
+        || JsonValidator::isObjectsArray(json)
+        || JsonValidator::isDatesArray(json);
 }
 
 bool JsonValidator::validateKeys(const std::string& json) 
@@ -493,7 +546,8 @@ bool JsonValidator::validateValues(const std::string& json)
                 || JsonValidator::isInteger(value) 
                 || JsonValidator::isFloatingPoint(value) || value == "null" 
                 || JsonValidator::isObject(value) || value == "true" || value == "false" 
-                || JsonValidator::isArray(value)) {
+                || JsonValidator::isArray(value)
+                || JsonValidator::isDate(value)) {
                 isValid = true;
             } else {
                 isValid = false;

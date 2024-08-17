@@ -8,6 +8,7 @@ enum JsonValueType
     STRING,
     INT,
     DOUBLE,
+    DATE,
     BOOLEAN,
     VALUE_ARRAY,
     OBJECT_ARRAY,

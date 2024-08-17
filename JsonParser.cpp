@@ -8,9 +8,16 @@ void JsonParser::destroy()
 {
     delete this->root;
 }
-int JsonParser::countWhitespaces(const JsonObject &root) const
+int JsonParser::countWhitespaces(const JsonObject &root, int& initial) const
 {
-    return root.getKey().length() + 3;
+    int newWhiteSpaces = 0;
+    if(initial == 0) {
+        newWhiteSpaces = initial + root.getKey().length() + 3;
+    } else {
+        newWhiteSpaces += 3;
+    }
+    initial = newWhiteSpaces;
+    return newWhiteSpaces;
 }
 std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
         std::stringstream ss(path);
@@ -34,7 +41,7 @@ std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::str
         }
         return {current, parent};
     }
-void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
+void JsonParser::printNode(JsonObject* root, int& whiteSpaces, int& initial) const
 {
     if (root == nullptr)
     {
@@ -43,45 +50,65 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
 
     if (root->getValue() != "")
     {
-        std::cout << " \"" << root->getKey() << "\": ";
-        whiteSpaces = this->countWhitespaces(*root);
-        if (root->getType() == JsonValueType::STRING)
+        std::string whites = std::string(whiteSpaces, ' ');
+        std::cout << whites << " \"" << root->getKey() << "\": ";
+        if (root->getType() == JsonValueType::STRING || root->getType() == JsonValueType::DATE)
         {
             std::cout << "\"" << root->getValue() << "\"";
         }
-        else if (root->getType() == JsonValueType::INT || root->getType() == JsonValueType::DOUBLE || root->getType() == JsonValueType::BOOLEAN)
+        else if (root->getType() == JsonValueType::INT 
+            || root->getType() == JsonValueType::DOUBLE 
+            || root->getType() == JsonValueType::BOOLEAN)
         {
             std::cout << root->getValue();
         }
         else if (root->getType() == JsonValueType::VALUE_ARRAY)
         {
             std::string whites = std::string(whiteSpaces + 1, ' ');
-            std::cout << std::endl
-                      << whites << "[" << std::endl;
-            std::cout << whites << " " << root->getValue().substr(1, root->getValue().length() - 2);
-            std::cout << std::endl
-                      << whites << "]";
-        }
-        else if (root->getType() == JsonValueType::OBJECT_ARRAY)
-        {
-            std::string whites = std::string(whiteSpaces + 1, ' ');
-            std::cout << std::endl
-                      << whites << "[" << std::endl;
-            for (unsigned int i = 0; i < root->getChildren().size(); ++i)
-            {
-                std::cout << whites << " ";
-                this->printNode(root->getChildren()[i], whiteSpaces);
-            }
-            std::cout << std::endl
-                      << whites << "]";
-        }
-        else if (root->getType() == JsonValueType::OBJECT)
-        {
-            this->printNode(root, whiteSpaces);
+            std::cout << whites << "[ ";
+            std::cout << whites << root->getValue().substr(1, root->getValue().length() - 2);
+            std::cout << whites << " ]" << std::endl;
         }
         else if (root->getType() == JsonValueType::NULL_VALUE)
         {
             std::cout << "null";
+        }
+    } else {
+        if (root->getType() == JsonValueType::OBJECT)
+        {
+            std::cout << " \"" << root->getKey() << "\": ";
+            whiteSpaces = this->countWhitespaces(*root->getChildren()[0], initial);
+            
+            std::string whites = std::string(whiteSpaces + 1, ' ');
+            std::cout << std::endl << whites << " {" << std::endl;
+            this->printNode(root->getChildren()[0], whiteSpaces, initial);
+            std::cout << std::endl << " }";
+        } else {
+        std::cout << " \"" << root->getKey() << "\": ";
+        whiteSpaces = this->countWhitespaces(*root, initial);
+        if (root->getType() == JsonValueType::OBJECT_ARRAY)
+        {
+            std::string whites = std::string(whiteSpaces + 1, ' ');
+            std::cout << std::endl
+                      << whites << "[";
+            std::string newWhites = std::string(whiteSpaces + 1, ' ');
+            for (unsigned int i = 0; i < root->getChildren().size(); ++i)
+            {
+                whiteSpaces = this->countWhitespaces(*root->getChildren()[i], initial);
+                std::cout << std::endl << newWhites << " {" << std::endl;
+                this->printNode(root->getChildren()[i], whiteSpaces, initial);
+                if(i == root->getChildren().size() - 1) {
+                    std::cout << std::endl << newWhites << " }" << std::endl;
+                } else {
+                    std::cout << std::endl << newWhites << " },";
+                }
+            }
+            std::cout << whites << "]";
+        }
+        else if (root->getType() == JsonValueType::OBJECT)
+        {
+            this->printNode(root->getChildren()[0], whiteSpaces, initial);
+        }
         }
     }
 
@@ -91,7 +118,7 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces) const
     }
 
     std::cout << "," << std::endl;
-    this->printNode(root->getNext(), whiteSpaces);
+    this->printNode(root->getNext(), whiteSpaces, initial);
 }
 JsonParser::JsonParser(const JsonObject& root)
 {
@@ -117,29 +144,33 @@ JsonParser::~JsonParser()
 }
 bool JsonParser::validate(const std::string& json) const
 {
+    bool isValid = JsonValidator::isObject(json);
+    if(isValid == true) {
+        return isValid;
+    }
     if (!JsonValidator::validateAllBraces(json))
     {
-        throw std::runtime_error("Braces error: Please, check all opening and closing braces!");
+        throw std::invalid_argument("Braces error: Please, check all opening and closing braces!");
     }
     if (!JsonValidator::validateKeys(json))
     {
-        throw std::runtime_error("Keys error: Please, check if all your keys' values are written in inverted commas!");
+        throw std::invalid_argument("Keys error: Please, check if all your keys' values are written in inverted commas!");
     }
     if (!JsonValidator::validateValues(json))
     {
-        throw std::runtime_error("Values error: Please, check all your values syntax! Numbers, booleans and null values should be written without inverted commas. Arrays should be written in [] and all element should be separated by a comma. Strings should be written in inverted commas.");
+        throw std::invalid_argument("Values error: Please, check all your values syntax! Numbers, booleans and null values should be written without inverted commas. Arrays should be written in [] and all element should be separated by a comma. Strings should be written in inverted commas.");
     }
     if(!JsonValidator::validateSeparators(json)) {
-        throw std::runtime_error("Key Value pair separators error: Please, check if all key value pair separators are put on the right place!");
+        throw std::invalid_argument("Separators error: Please, check if all separators are put on the right place!");
     }
 
-    return true;
+    return false;
 }
 void JsonParser::print() const
 {
     std::cout << "{" << std::endl;
-    int whiteSpaces = 0;
-    this->printNode(this->root, whiteSpaces);
+    int whiteSpaces = 0, initial = 0;
+    this->printNode(this->root, whiteSpaces, initial);
     std::cout << std::endl
               << "}";
 }

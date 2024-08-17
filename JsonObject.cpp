@@ -51,6 +51,8 @@ JsonObject::JsonObject(const std::string& json)
             this->valueType = JsonValueType::INT;
         } else if (JsonValidator::isFloatingPoint(this->value)) {
             this->valueType = JsonValueType::DOUBLE;
+        } else if(JsonValidator::isDate(this->value)) {
+            this->valueType = JsonValueType::DATE;
         } else if (this->value == "true" || this->value == "false") {
             this->valueType = JsonValueType::BOOLEAN;
         } else if (this->value == "null") {
@@ -65,9 +67,12 @@ JsonObject::JsonObject(const std::string& json)
         }
     }
 }
-JsonObject::JsonObject(JsonValueType type, const std::string &key, const std::string &value, JsonObject *next)
-    : valueType(type), key(key), value(value), next(next), children(std::vector<JsonObject *>())
+JsonObject::JsonObject(JsonValueType type, const std::string &key, const std::string &value, std::vector<JsonObject*> children, JsonObject *next)
+    : valueType(type), key(key), value(value), next(next), children(std::vector<JsonObject*>())
 {
+    for(int i = 0; i < children.size(); ++i) {
+        this->children.push_back(children[i]);
+    }
 }
 JsonObject::JsonObject(const JsonObject &other)
 {

@@ -9,16 +9,30 @@
 int main()
 {
 
-    /*JsonObject* json = new JsonObject(JsonValueType::STRING, "name", "John Doe",
-        new JsonObject(JsonValueType::VALUE_ARRAY, "gradesAtUni", "[6.0, 3.0, 5.0, 4.4]",
-            new JsonObject(JsonValueType::DOUBLE, "salary", "1500", nullptr)));
+    JsonObject* json = 
+        new JsonObject(JsonValueType::STRING, "name", "ACME Software Co.", std::vector<JsonObject*>(),
+        new JsonObject(JsonValueType::STRING, "type", "Software Development Company", std::vector<JsonObject*>(),
+        new JsonObject(JsonValueType::OBJECT_ARRAY, "officess", "", {
+                                                                        new JsonObject(JsonValueType::STRING, "name", "Headquarters", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::STRING, "address", "Sofia", std::vector<JsonObject*>(), nullptr)),
+                                                                        new JsonObject(JsonValueType::STRING, "name", "Front Offices", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::STRING, "address", "New York City", std::vector<JsonObject*>(), nullptr))},
+        new JsonObject(JsonValueType::OBJECT_ARRAY, "members", "", {
+                                                                        new JsonObject(JsonValueType::INT, "id", "0", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::STRING, "name", "John Smith", std::vector<JsonObject*>(),
+                                                                                new JsonObject(JsonValueType::DATE, "birthdate", "1980-01-01", std::vector<JsonObject*>(), nullptr))),
+                                                                        new JsonObject(JsonValueType::INT, "id", "1", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::STRING, "name", "Jane Smith", std::vector<JsonObject*>(),
+                                                                                new JsonObject(JsonValueType::DATE, "birthdate", "1981-02-02", std::vector<JsonObject*>(), nullptr))),
+                                                                        new JsonObject(JsonValueType::INT, "id", "2", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::STRING, "name", "John Doe", std::vector<JsonObject*>(),
+                                                                                new JsonObject(JsonValueType::DATE, "birthdate", "1982-03-03", std::vector<JsonObject*>(), nullptr)))},
+        new JsonObject(JsonValueType::OBJECT, "management", "", {
+                                                                        new JsonObject(JsonValueType::INT, "directorId", "0", std::vector<JsonObject*>(),
+                                                                            new JsonObject(JsonValueType::INT, "presidentId", "1", std::vector<JsonObject*>(), nullptr))
+        }, nullptr)))));
     JsonParser jp = JsonParser(*json);
-    jp.print();*/
-
-    std::string js = "{\n\"is\":1,\n\"nm\":\"object\",\n\"something\":{\n\"name\":\"Petya\",\n\"age\":21\n},\n\"price\":5.50,\n\"data\":[1,2,3,4,5]\n}";
-    /*std::string* ns = new std::string("");
-    ns = &v.skipWhiteSpaces(js);*/
-    std::cout << std::boolalpha << JsonValidator::isObject(js);
+    jp.print();
     
     return 0;
 }

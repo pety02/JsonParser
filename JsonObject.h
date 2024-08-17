@@ -33,7 +33,7 @@ public:
     /// @param key the key of the object
     /// @param value the value of the object
     /// @param next the next node of the object
-    JsonObject(JsonValueType, const std::string&, const std::string&, JsonObject*);
+    JsonObject(JsonValueType, const std::string&, const std::string&, std::vector<JsonObject*>,  JsonObject*);
     /// @brief Copy constructor
     /// @param other an object to be copied
     JsonObject(const JsonObject&);
