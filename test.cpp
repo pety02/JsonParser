@@ -31,8 +31,9 @@ int main()
                                                                         new JsonObject(JsonValueType::INT, "directorId", "0", std::vector<JsonObject*>(),
                                                                             new JsonObject(JsonValueType::INT, "presidentId", "1", std::vector<JsonObject*>(), nullptr))
         }, nullptr)))));
-    JsonParser jp = JsonParser(*json);
-    jp.print();
+    JsonParser jp = JsonParser("companies.txt");
+    jp.print(std::cout);
+    jp.save();
     
     return 0;
 }

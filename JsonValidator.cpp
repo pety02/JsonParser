@@ -538,7 +538,7 @@ bool JsonValidator::validateKeys(const std::string& json)
                 break;
             }
             key = "";
-            while(json[i] != '\n') {
+            while(json[i] != '\n' && json[i] != '\0') {
                 i++;
             }
         }
@@ -581,7 +581,7 @@ bool JsonValidator::validateValues(const std::string& json)
             }
             if(!hasArray) {
                 do {   
-                    if((json[i] == ',' && json[i + 1] == '\n') || json[i] == '\n') {
+                    if((json[i] == ',' && json[i + 1] == '\n') || json[i] == '\n' || json[i] == '\0') {
                         break;
                     }
                     value += json[i++];
@@ -637,7 +637,7 @@ bool JsonValidator::validateSeparators(const std::string& json)
     int separatorsCount = 0, keyValuePairsCount = 0;
     std::string key = "";
     bool hasArray = false;
-    for (unsigned int i = 1; i < json.length() - 1;)
+    for (int i = 1; i < json.length() - 1;)
     {
         if (json[i] == '{' || json[i] == ' ' || json[i] == ',' 
             || json[i] == '\n' || json[i] == '}')
@@ -661,6 +661,9 @@ bool JsonValidator::validateSeparators(const std::string& json)
             }
             if(!hasArray) {
                 while(json[i] != ',') {
+                    if(i == json.length()) {
+                        break;
+                    }
                     i++;
                 }
                 if(json[i] == ',') {

@@ -3,9 +3,11 @@
 #define JSON_PARSER_H
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <exception>
 #include <sstream>
+#include <cmath>
 #include "JsonObject.h"
 
 /// @brief a class that descibes a json parser
@@ -13,19 +15,23 @@ class JsonParser final
 {
 private:
     JsonObject *root;
+    std::string filename;
  
     void copy(const JsonParser&);
     void destroy();
-    JsonParser() = default;
 
     int countWhitespaces(const JsonObject&) const;
     std::pair<JsonObject*, JsonObject*> findNodeAndParent(const std::string& path);
-    void printNode(JsonObject*, int&) const;
+    void printNode(JsonObject*, int&, std::ostream&) const;
 
 public:
+    JsonParser(std::string);
     /// @brief Constructor with a parameter
     /// @param root an object to be set as root of the json objects array
     JsonParser(const JsonObject&);
+    /// @brief 
+    /// @param  
+    JsonParser(JsonParser&&) noexcept;
     /// @brief Copy constructor
     /// @param other an object to be copied  
     JsonParser(const JsonParser&);
@@ -33,6 +39,10 @@ public:
     /// @param other an object to be assigned
     /// @return a reference to this object
     JsonParser &operator=(const JsonParser&);
+    /// @brief 
+    /// @param  
+    /// @return 
+    JsonParser &operator=(JsonParser&&) noexcept;
     /// @brief Destructor
     ~JsonParser();
 
@@ -41,7 +51,8 @@ public:
     /// @return true if the string is a valid json and false in the other cases
     bool validate(const std::string&) const;
     /// @brief prints a string in json format
-    void print() const;
+    /// @param out
+    void print(std::ostream&) const;
     /// @brief searches all json objects in the json objects array by a definite key 
     /// @param key the key to search
     /// @return a vector of JsonObject pointers
@@ -67,11 +78,19 @@ public:
     void move(const std::string&, std::string&);
     /// @brief 
     /// @param  
-    void save(const std::string&) const;
+    void open(std::string);
+    /// @brief 
+    /// @param  
+    void close(std::string);
+    /// @brief 
+    int exit();
+    /// @brief 
+    /// @param  
+    void save() const;
     /// @brief 
     /// @param  
     /// @param  
-    void saveAs(const std::string&, const std::string&) const;
+    void saveAs(const std::string&) const;
 };
 
 #endif
