@@ -335,7 +335,7 @@ void JsonParser::open(std::string filename)
             if(isEndOfText) {
                 break;
             }
-            while(allData[i] != '\"') {
+            while(!JsonValidator::isLetter(allData[i])) {
                 currKey += allData[i++];
             }
             if(!hasChildren) {
@@ -379,17 +379,17 @@ void JsonParser::open(std::string filename)
             }
         }
 
-        JsonObject* tmp = this->root;
-        for(int i = 0; i < keys.size(); ++i) {
-            if(i == 0) {
-                tmp = new JsonObject(JsonValueType::STRING, keys[i], values[i], std::vector<JsonObject*>(), nullptr);
-                continue;
-            } 
+        JsonObject* tmp = nullptr;
+        for (int i = 0; i < keys.size(); ++i) {
             JsonObject* newNode = new JsonObject(JsonValueType::STRING, keys[i], values[i], std::vector<JsonObject*>(), nullptr);
-            tmp->setNext(*newNode);
-            tmp = tmp->getNext();
+            if (i == 0) {
+                this->root = newNode;
+                tmp = this->root;
+            } else {
+                tmp->setNext(*newNode); 
+                tmp = newNode;
+            }
         }
-        this->root = tmp;
     } catch(std::exception&) {
         this->root = nullptr;
     }
