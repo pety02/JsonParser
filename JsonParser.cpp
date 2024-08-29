@@ -9,6 +9,28 @@ void JsonParser::destroy()
 {
     delete this->root;
 }
+JsonValueType JsonParser::getType(std::string value) const
+{
+    if(JsonValidator::isInteger(value)) {
+        return JsonValueType::INT;
+    } else if (JsonValidator::isFloatingPoint(value)) {
+        return JsonValueType::DOUBLE;
+    } else if (JsonValidator::isDate(value)) {
+        return JsonValueType::DATE;
+    } else if (value == "true" || value == "false") {
+        return JsonValueType::BOOLEAN;
+    } else if (JsonValidator::isIntegersArray(value) || JsonValidator::isFloatingPointsArray(value) 
+        || JsonValidator::isBooleansArray(value) || JsonValidator::isDatesArray(value) 
+        || JsonValidator::isStringsArray(value)) {
+        return JsonValueType::VALUE_ARRAY;
+    } else if (JsonValidator::isObject(value)) {
+        return JsonValueType::OBJECT;
+    } else if (JsonValidator::isObjectsArray(value)) {
+        return JsonValueType::OBJECT_ARRAY;
+    } else {
+        return JsonValueType::STRING;
+    }
+}
 int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     int newWhiteSpaces = 1;
@@ -58,59 +80,58 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out
     if (root->getValue() != "")
     {
         std::string whites = std::string(whiteSpaces, ' ');
-        std::cout << whites << " \"" << root->getKey() << "\": ";
+        out << whites << " \"" << root->getKey() << "\": ";
         if (root->getType() == JsonValueType::STRING || root->getType() == JsonValueType::DATE)
         {
-            std::cout << "\"" << root->getValue() << "\"";
+            out << "\"" << root->getValue() << "\"";
         }
         else if (root->getType() == JsonValueType::INT 
             || root->getType() == JsonValueType::DOUBLE 
             || root->getType() == JsonValueType::BOOLEAN)
         {
-            std::cout << root->getValue();
+            out << root->getValue();
         }
         else if (root->getType() == JsonValueType::VALUE_ARRAY)
         {
             std::string whites = std::string(whiteSpaces + 1, ' ');
-            std::cout << whites << "[ ";
-            std::cout << whites << root->getValue().substr(1, root->getValue().length() - 2);
-            std::cout << whites << " ]" << std::endl;
+            out << whites << "[ ";
+            out << whites << root->getValue().substr(1, root->getValue().length() - 2);
+            out << whites << " ]" << std::endl;
         }
         else if (root->getType() == JsonValueType::NULL_VALUE)
         {
-            std::cout << "null";
+            out << "null";
         }
     } else {
         if (root->getType() == JsonValueType::OBJECT)
         {
-            std::cout << " \"" << root->getKey() << "\": ";
+            out << " \"" << root->getKey() << "\": ";
             whiteSpaces = this->countWhitespaces(*root->getChildren()[0]);
             
             std::string whites = std::string(whiteSpaces + 1, ' ');
-            std::cout << std::endl << whites << " {" << std::endl;
+            out << std::endl << whites << " {" << std::endl;
             this->printNode(root->getChildren()[0], whiteSpaces, out);
-            std::cout << std::endl << whites << " }";
+            out << std::endl << whites << " }";
         } else {
-        std::cout << " \"" << root->getKey() << "\": ";
+        out << " \"" << root->getKey() << "\": ";
         whiteSpaces = this->countWhitespaces(*root);
         if (root->getType() == JsonValueType::OBJECT_ARRAY)
         {
             std::string whites = std::string(whiteSpaces + 1, ' ');
-            std::cout << std::endl
-                      << whites << "[";
+            out << std::endl << whites << "[";
             std::string newWhites = std::string(whiteSpaces + 1, ' ');
             for (unsigned int i = 0; i < root->getChildren().size(); ++i)
             {
                 whiteSpaces = this->countWhitespaces(*root->getChildren()[i]);
-                std::cout << std::endl << newWhites << " {" << std::endl;
+                out << std::endl << newWhites << " {" << std::endl;
                 this->printNode(root->getChildren()[i], whiteSpaces, out);
                 if(i == root->getChildren().size() - 1) {
-                    std::cout << std::endl << newWhites << " }" << std::endl;
+                    out << std::endl << newWhites << " }" << std::endl;
                 } else {
-                    std::cout << std::endl << newWhites << " },";
+                    out << std::endl << newWhites << " },";
                 }
             }
-            std::cout << whites << "]";
+            out << whites << "]";
         }
         else if (root->getType() == JsonValueType::OBJECT)
         {
@@ -124,7 +145,7 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out
         return;
     }
 
-    std::cout << "," << std::endl;
+    out << "," << std::endl;
     this->printNode(root->getNext(), whiteSpaces, out);
 }
 JsonParser::JsonParser(std::string filename)
@@ -315,17 +336,21 @@ void JsonParser::open(std::string filename)
             allData += readData;
             allData += '\n';
         }
-        /*if(!this->validate(allData)) {
+        // Probably can have mistakes in validation work flow
+        /*
+        if(!this->validate(allData)) {
             throw std::invalid_argument("Read data not valid json!");
-        }*/
+        }
+        */
         std::vector<std::string> keys;
-        std::vector<std::string> currObjKeys;
+        std::vector<std::vector<std::string>> currObjsKeys;
+        std::vector<std::string> currObjKeys, currObjValues;
         std::vector<std::string> values;
         std::string currKey, currValue;
-        std::vector<std::string> currObjValues;
+        std::vector<std::vector<std::string>> currObjsValues;
         bool hasChildren = false, isEndOfText = false;;
         for(int i = 0; i < allData.length();) {
-            while(allData[i] != '\"') {
+            while(!JsonValidator::isLetter(allData[i])) {
                 if (allData[i] == '\0') {
                     isEndOfText = true;
                     break;
@@ -335,61 +360,89 @@ void JsonParser::open(std::string filename)
             if(isEndOfText) {
                 break;
             }
-            while(!JsonValidator::isLetter(allData[i])) {
+            while(allData[i] != '\"') {
                 currKey += allData[i++];
             }
             if(!hasChildren) {
                 keys.push_back(currKey);
                 currKey = "";
+                i++;
             } else {
                 currObjKeys.push_back(currKey);
                 currKey = "";
+                i++;
             }
-            while(allData[i] != '\"' && allData[i] != '[' && allData[i] != '{') {
+            while(allData[i] != '\"' && allData[i] != '[' && allData[i] != '{' && !JsonValidator::isDigit(allData[i])) {
                 i++;
             }
             if(allData[i] == '\"') {
+                i++;
+                while(allData[i] != '\"') {
+                    currValue += allData[i++];
+                }
+                if(!hasChildren) {
+                    values.push_back(currValue);
+                    currValue = "";
+                    i++;
+                } else {
+                    currObjValues.push_back(currValue);
+                    currValue = "";
+                    i++;
+                }
+            } else if (allData[i] == '[') {
+                while(allData[i] != '\"' && !JsonValidator::isLetter(allData[i]) && !JsonValidator::isDigit(allData[i]) 
+                    && !JsonValidator::isLetter(allData[i]) && allData[i] != '{') {
+                    i++;
+                }
+                if(allData[i] == '{') {
+                    while(allData[i] != ',') {
+                        currValue += allData[i++];
+                    }
+                    hasChildren = true;
+                    continue;
+                } else {
+                    while(allData[i] != ',') {
+                        currValue += allData[i++];
+                        break;
+                    }
+                }
+                if(!hasChildren) {
+                    values.push_back(currValue);
+                    currValue = "";
+                } else {
+                    currObjValues.push_back(currValue);
+                    currValue = "";
+                }
+            } else if (allData[i] == ']') {
+                i++;
+                currObjsKeys.push_back(currObjKeys);
+                currObjsValues.push_back(currObjValues);
+
+                currObjKeys.clear();
+                currObjKeys.clear();
+            } else if (JsonValidator::isDigit(allData[i])) {
                 while(allData[i] != ',' && allData[i] != '\n') {
                     currValue += allData[i++];
                 }
-                if(!hasChildren) {
-                    values.push_back(currValue);
-                    currValue = "";
-                } else {
-                    currObjValues.push_back(currValue);
-                    currValue = "";
-                }
-            } else if (allData[i] == '[') {
-                /*if(allData[i + 1] == '{') {
-                    hasChildren = true;
-                    continue;
-                } */
-                while(allData[i] != ']') {
-                    currValue += allData[i++];
-                }
-                if(!hasChildren) {
-                    values.push_back(currValue);
-                    currValue = "";
-                } else {
-                    currObjValues.push_back(currValue);
-                    currValue = "";
-                }
+                values.push_back(currValue);
+                currValue = "";
             } else {
                 i++;
             }
         }
 
-        JsonObject* tmp = nullptr;
-        for (int i = 0; i < keys.size(); ++i) {
-            JsonObject* newNode = new JsonObject(JsonValueType::STRING, keys[i], values[i], std::vector<JsonObject*>(), nullptr);
-            if (i == 0) {
-                this->root = newNode;
-                tmp = this->root;
-            } else {
-                tmp->setNext(*newNode); 
-                tmp = newNode;
-            }
+        JsonObject* newNode = new JsonObject(JsonValueType::STRING, keys[0], values[0], std::vector<JsonObject*>(), nullptr);
+        if (this->root == nullptr) {
+            this->root = newNode;
+        } 
+        JsonObject* tmp = this->root;
+        for (int i = 1; i < keys.size(); ++i) {
+            JsonValueType currType = getType(values[i]);
+            newNode = new JsonObject(currType, keys[i], values[i], std::vector<JsonObject*>(), nullptr);
+            tmp->setNext(*newNode); 
         }
+
+        delete newNode;
     } catch(std::exception&) {
         this->root = nullptr;
     }

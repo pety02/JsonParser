@@ -20,6 +20,7 @@ private:
     void copy(const JsonParser&);
     void destroy();
 
+    JsonValueType getType(std::string) const;
     int countWhitespaces(const JsonObject&) const;
     std::pair<JsonObject*, JsonObject*> findNodeAndParent(const std::string& path);
     void printNode(JsonObject*, int&, std::ostream&) const;
