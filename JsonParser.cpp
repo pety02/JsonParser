@@ -519,18 +519,18 @@ void JsonParser::open(std::string filename)
     }
     in.close();
 }
-void JsonParser::close(std::string filename)
-{
-    std::ofstream out(filename);
-    if(out) {
-        out.close();
-    }
-}
 int JsonParser::exit()
 {
-    std::ofstream out(this->filename);
-    if(out) {
-        out.close();
+    std::cout << std::endl << std::endl << "Would you want to save all changes?" << std::endl << std::endl << "Y/N" << std::endl << "> ";
+    char option;
+    do {
+        std::cin >> option;
+    } while (option != 'Y' && option != 'N');
+
+    if(option == 'Y') {
+        this->save();
+    } else {
+        this->open(this->filename);
     }
     return 0;
 }

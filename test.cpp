@@ -37,7 +37,6 @@ int main()
     //jp.save();
     //jp.saveAs("C:\\Users\\User\\OneDrive\\Documents\\University\\1 kurs, 2 semestur\\OOP\\2023-2024\\JsonParser\\test_save_as2.txt");
     jp.setTo("{\n \"name\": \"John\",\n \"age\": 25,\n \"name\": \"mara\",\n \"surname\": \"Doe\"\n}", "{\n \"grades\": [5, 4, 6, 3, 5]\n}");
-    jp.save();
     
-    return 0;
+    return jp.exit();;
 }

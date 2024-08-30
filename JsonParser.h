@@ -83,10 +83,7 @@ public:
     /// @param  
     void open(std::string); // works
     /// @brief 
-    /// @param  
-    void close(std::string);
-    /// @brief 
-    int exit();
+    int exit(); // works
     /// @brief 
     /// @param  
     void save() const; // works
