@@ -1,5 +1,8 @@
 {
  "name": "John",
  "age": 25,
- "name": "mara"
+ "name": "mara",
+ "surname": "Doe",
+ "grades":  [  5, 4, 6, 3  ]
+
 }

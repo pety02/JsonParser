@@ -25,6 +25,7 @@ private:
     std::pair<JsonObject*, JsonObject*> findNodeAndParent(const std::string& path); 
     void printNode(JsonObject*, int&, std::ostream&) const; // works
     bool containsHelper(const std::string, JsonObject*) const; // works
+    JsonObject* createFromJsonString(std::string); // works
 public:
     /// @brief Default constructor
     JsonParser(); // works
@@ -66,7 +67,7 @@ public:
     /// @brief 
     /// @param  
     /// @param  
-    void setTo(const std::string&, const std::string&);
+    void setTo(const std::string&, const std::string&); // works
     /// @brief 
     /// @param  
     /// @param  

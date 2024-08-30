@@ -90,13 +90,11 @@ JsonObject &JsonObject::operator=(const JsonObject &other)
 }
 bool operator==(const JsonObject &left, const JsonObject &right)
 {
-    return left.valueType == right.valueType && left.key == right.key 
-        && left.value == right.value && left.next == right.next 
-        && left.children == right.children;
+    return left.key == right.key && left.value == right.value;
 }
 bool operator!=(const JsonObject &left, const JsonObject &right)
 {
-    return !(left == right);
+    return left.key != right.key && left.value != right.value;
 }
 JsonObject::~JsonObject()
 {
@@ -104,7 +102,7 @@ JsonObject::~JsonObject()
 }
 void JsonObject::setNext(const JsonObject &newNext)
 {
-    this->next = new JsonObject(newNext);
+    this->next = new JsonObject(newNext.getType(), newNext.getKey(), newNext.getValue(), newNext.getChildren(), newNext.getNext());
 }
 void JsonObject::add(const JsonObject &node)
 {
