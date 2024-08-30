@@ -31,10 +31,13 @@ int main()
             new JsonObject(JsonValueType::INT, "directorId", "0", std::vector<JsonObject*>(),
                 new JsonObject(JsonValueType::INT, "presidentId", "1", std::vector<JsonObject*>(), nullptr))
         }, nullptr)))));*/
-    JsonParser jp = JsonParser("C:\\Users\\User\\OneDrive\\Documents\\University\\1 kurs, 2 semestur\\OOP\\2023-2024\\JsonParser\\tst_data.txt");
+    JsonParser jp = JsonParser();
     jp.open("C:\\Users\\User\\OneDrive\\Documents\\University\\1 kurs, 2 semestur\\OOP\\2023-2024\\JsonParser\\tst_data.txt");
     jp.print(std::cout);
-    jp.save();
-    
+    //jp.save();
+    //jp.saveAs("C:\\Users\\User\\OneDrive\\Documents\\University\\1 kurs, 2 semestur\\OOP\\2023-2024\\JsonParser\\test_save_as2.txt");
+
+    bool isContains = jp.contains("mara");
+    std::cout << std::boolalpha << isContains << std::endl;
     return 0;
 }

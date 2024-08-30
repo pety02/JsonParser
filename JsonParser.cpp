@@ -148,10 +148,10 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out
     out << "," << std::endl;
     this->printNode(root->getNext(), whiteSpaces, out);
 }
-JsonParser::JsonParser(std::string filename)
+JsonParser::JsonParser()
 {
     this->root = nullptr;
-    this->filename = filename;
+    this->filename = "";
 }
 JsonParser::JsonParser(const JsonObject &root)
 {
@@ -227,24 +227,77 @@ std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 {
     std::vector<JsonObject*> values = std::vector<JsonObject*>();
     JsonObject* temp = this->root;
-    while(temp->getNext()) {
-        if(this->root->getKey() == key) {
-            values.push_back(new JsonObject(this->root->getValue()));
+    while(temp) {
+        if(temp->getKey() == key) {
+            JsonValueType currentType = this->getType(temp->getValue());
+            values.push_back(new JsonObject(currentType, temp->getKey(), temp->getValue(), std::vector<JsonObject*>(), temp->getNext()));
         }
-        temp->setNext(*root->getNext());
+        temp = temp->getNext();
     }
 
     return values;
 }
-bool JsonParser::contains(const std::string& value) const
+bool JsonParser::contains(std::string value) const
 {
-    JsonObject* obj = new JsonObject(value);
-    JsonObject* temp = this->root;
-    while(temp->getNext()) {
-        if(this->root == obj) {
+    return containsHelper(value, this->root);
+}
+bool JsonParser::containsHelper(const std::string value, JsonObject *obj) const
+{
+    JsonObject* temp = obj;
+    while(temp) {
+        JsonValueType currentType = this->getType(temp->getValue());
+        if((currentType == JsonValueType::NULL_VALUE || currentType == JsonValueType::INT 
+            || currentType == JsonValueType::DOUBLE || currentType == JsonValueType::DATE
+            || currentType == JsonValueType::BOOLEAN) && temp->getValue() == value) {
             return true;
+        } else if (currentType == JsonValueType::VALUE_ARRAY) {
+            std::string vals = temp->getValue();
+            std::string val = "";
+            for(int i = 0; i < vals.length(); ++i) {
+                if(vals[i] == '[' || vals[i] == ']' || vals[i] == ' ') {
+                    continue;
+                }
+                if(vals[i] == ',') {
+                    if(val == value) {
+                        return true;
+                    }
+                    val = "";
+                    continue;
+                }
+                val += vals[i];
+            }
+        } else if (currentType == JsonValueType::OBJECT) {
+            if(containsHelper(value, temp->getChildren()[0])) {
+                return true;
+            }
+        } else if (currentType == JsonValueType::OBJECT_ARRAY) {
+            for(int i = 0; i < temp->getChildren().size(); ++i) {
+                if(containsHelper(value, temp->getChildren()[i])) {
+                    return true;
+                }
+            }
+        } else if(currentType == JsonValueType::STRING) {
+            std::string val = temp->getValue();
+            if(val.length() < value.length()) {
+                temp = temp->getNext();
+                continue;
+            }
+            for(int i = 0; i < val.length(); ++i) {
+                if(val[i] == value[i]) {
+                    if(val.length() - i < value.length()) {
+                        continue;
+                    }
+                    val = val.substr(i, value.length());
+                    if(val == value) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            temp = temp->getNext();
+            continue;
         }
-        temp->setNext(*this->root->getNext());
+        temp = temp->getNext();
     }
     return false;
 }
@@ -337,11 +390,9 @@ void JsonParser::open(std::string filename)
             allData += '\n';
         }
         // Probably can have mistakes in validation work flow
-        /*
         if(!this->validate(allData)) {
             throw std::invalid_argument("Read data not valid json!");
         }
-        */
         std::vector<std::string> keys;
         std::vector<std::vector<std::string>> currObjsKeys;
         std::vector<std::string> currObjKeys, currObjValues;
@@ -440,6 +491,7 @@ void JsonParser::open(std::string filename)
             JsonValueType currType = getType(values[i]);
             newNode = new JsonObject(currType, keys[i], values[i], std::vector<JsonObject*>(), nullptr);
             tmp->setNext(*newNode); 
+            tmp = tmp->getNext();
         }
 
         delete newNode;
