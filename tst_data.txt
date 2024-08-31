@@ -1,8 +1,9 @@
 {
- "name": "John",
- "age": 25,
- "name": "mara",
- "surname": "Doe",
- "grades":  [  5, 4, 6, 3  ]
-
+ "name": "A",
+ "type": "S",
+ "mngment": 
+            {
+           "dId": 0,
+           "pId": 1
+            }
 }

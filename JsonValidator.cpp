@@ -30,7 +30,7 @@ bool JsonValidator::validateSimpleBraces(const std::string& json)
 
 bool JsonValidator::validateCurlyBraces(const std::string& json)
 {
-    std::vector<char> braces = std::vector<char>();
+    std::stack<char> braces = std::stack<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
@@ -45,11 +45,11 @@ bool JsonValidator::validateCurlyBraces(const std::string& json)
         }
         if (json[i] == '{')
         {
-            braces.push_back(json[i]);
+            braces.push(json[i]);
         }
         if (json[i] == '}' && !braces.empty())
         {
-            braces.pop_back();
+            braces.pop();
         }
     }
 
@@ -426,7 +426,7 @@ bool JsonValidator::isBooleansArray(const std::string& json)
 bool JsonValidator::isObject(const std::string& json)
 {
     std::string skippedWhites = JsonValidator::skipWhiteSpaces(json);
-    bool isValid = json == "null" || 
+    bool isValid = skippedWhites == "null" || 
         (JsonValidator::validateAllBraces(skippedWhites)
         && JsonValidator::validateKeys(skippedWhites) 
         && JsonValidator::validateSeparators(skippedWhites) 
@@ -488,8 +488,8 @@ std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
 
 bool JsonValidator::validateAllBraces(const std::string& json) 
 {
-    return JsonValidator::validateBraces(json, BracesType::SIMPLE) 
-        && JsonValidator::validateBraces(json, BracesType::CURLY) 
+    return /*JsonValidator::validateBraces(json, BracesType::SIMPLE)
+        &&*/ JsonValidator::validateBraces(json, BracesType::CURLY) 
         && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
 }
 

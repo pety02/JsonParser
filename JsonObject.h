@@ -21,7 +21,6 @@ private:
 
     void copy(const JsonObject &);
     void destroy();
-
 public:
     /// @brief Default constructor
     JsonObject() = default;

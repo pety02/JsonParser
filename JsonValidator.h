@@ -3,6 +3,7 @@
 #define JSON_VALIDATOR_H
 
 #include <vector>
+#include <stack>
 #include <string>
 #include <cstring>
 #include <cstdlib>
