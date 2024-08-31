@@ -1,7 +1,8 @@
 #include "JsonObject.h"
 
-/// @brief 
-/// @param other 
+/// @brief Copy constructor of JsonObject class
+/// @param other the copied object
+/// @author Petya Licheva - pety02
 void JsonObject::copy(const JsonObject &other)
 {
     this->valueType = other.valueType;
@@ -15,15 +16,18 @@ void JsonObject::copy(const JsonObject &other)
     }
 }
 
-/// @brief 
+/// @brief Destroying the object
+/// @author Petya Licheva - pety02
 void JsonObject::destroy()
 {
-    delete this->next;
     this->children.clear();
+    delete this->next;
 }
 
 /// @brief 
 /// @param json 
+/// @return 
+/// @author Petya Licheva - pety02
 JsonObject::JsonObject(const std::string& json)
 {
     std::string key, value, read;
@@ -80,6 +84,8 @@ JsonObject::JsonObject(const std::string& json)
 /// @param value 
 /// @param children 
 /// @param next 
+/// @return
+/// @author Petya Licheva - pety02
 JsonObject::JsonObject(JsonValueType type, const std::string &key, const std::string &value, std::vector<JsonObject*> children, JsonObject *next)
     : valueType(type), key(key), value(value), next(next), children(std::vector<JsonObject*>())
 {
@@ -90,6 +96,8 @@ JsonObject::JsonObject(JsonValueType type, const std::string &key, const std::st
 
 /// @brief 
 /// @param other 
+/// @return 
+/// @author Petya Licheva - pety02
 JsonObject::JsonObject(const JsonObject &other)
 {
     this->copy(other);
@@ -98,6 +106,7 @@ JsonObject::JsonObject(const JsonObject &other)
 /// @brief 
 /// @param other 
 /// @return 
+/// @author Petya Licheva - pety02
 JsonObject &JsonObject::operator=(const JsonObject &other)
 {
     if (this != &other)
@@ -113,6 +122,7 @@ JsonObject &JsonObject::operator=(const JsonObject &other)
 /// @param left 
 /// @param right 
 /// @return 
+/// @author Petya Licheva - pety02
 bool operator==(const JsonObject &left, const JsonObject &right)
 {
     return left.key == right.key && left.value == right.value;
@@ -122,12 +132,14 @@ bool operator==(const JsonObject &left, const JsonObject &right)
 /// @param left 
 /// @param right 
 /// @return 
+/// @author Petya Licheva - pety02
 bool operator!=(const JsonObject &left, const JsonObject &right)
 {
     return left.key != right.key && left.value != right.value;
 }
 
 /// @brief 
+/// @author Petya Licheva - pety02
 JsonObject::~JsonObject()
 {
     this->destroy();
@@ -135,6 +147,7 @@ JsonObject::~JsonObject()
 
 /// @brief 
 /// @param newNext 
+/// @author Petya Licheva - pety02
 void JsonObject::setNext(const JsonObject &newNext)
 {
     this->next = new JsonObject(newNext.getType(), newNext.getKey(), newNext.getValue(), newNext.getChildren(), newNext.getNext());
@@ -142,6 +155,7 @@ void JsonObject::setNext(const JsonObject &newNext)
 
 /// @brief 
 /// @param node 
+/// @author Petya Licheva - pety02
 void JsonObject::add(const JsonObject &node)
 {
     this->children.push_back(new JsonObject(node));
@@ -149,6 +163,7 @@ void JsonObject::add(const JsonObject &node)
 
 /// @brief 
 /// @param node 
+/// @author Petya Licheva - pety02
 void JsonObject::remove(const JsonObject &node)
 {
     for (unsigned int index = 0; index < this->children.size(); ++index)
@@ -163,6 +178,7 @@ void JsonObject::remove(const JsonObject &node)
 
 /// @brief 
 /// @return 
+/// @author Petya Licheva - pety02
 JsonValueType JsonObject::getType() const
 {
     return this->valueType;
@@ -170,6 +186,7 @@ JsonValueType JsonObject::getType() const
 
 /// @brief 
 /// @return 
+/// @author Petya Licheva - pety02
 std::string JsonObject::getKey() const
 {
     return this->key;
@@ -177,13 +194,15 @@ std::string JsonObject::getKey() const
 
 /// @brief 
 /// @return 
+/// @author Petya Licheva - pety02
 std::string JsonObject::getValue() const
 {
     return this->value;
 }
 
 /// @brief 
-/// @return 
+/// @return
+/// @author Petya Licheva - pety02 
 JsonObject *JsonObject::getNext() const
 {
     return this->next;
@@ -191,6 +210,7 @@ JsonObject *JsonObject::getNext() const
 
 /// @brief 
 /// @return 
+/// @author Petya Licheva - pety02
 std::vector<JsonObject *> JsonObject::getChildren() const
 {
     return this->children;
