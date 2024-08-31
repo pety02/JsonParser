@@ -2,7 +2,6 @@
 #ifndef JSON_VALUE_TYPE_H
 #define JSON_VALUE_TYPE_H
 
-/// @brief an enum that contains all possible json value types
 enum JsonValueType
 {
     STRING,

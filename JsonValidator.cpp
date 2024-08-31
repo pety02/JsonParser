@@ -1,9 +1,11 @@
 #include "JsonValidator.h"
 
-
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateCurlyBraces(const std::string& json)
 {
-    std::stack<char> braces = std::stack<char>();
+    std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
@@ -18,20 +20,23 @@ bool JsonValidator::validateCurlyBraces(const std::string& json)
         }
         if (json[i] == '{')
         {
-            braces.push(json[i]);
+            braces.push_back(json[i]);
         }
         if (json[i] == '}' && !braces.empty())
         {
-            braces.pop();
+            braces.erase(braces.begin());
         }
     }
 
     return braces.size() == 0;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateStraightBraces(const std::string& json)
 {
-    std::stack<char> braces = std::stack<char>();
+    std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
@@ -46,17 +51,21 @@ bool JsonValidator::validateStraightBraces(const std::string& json)
         }
         if (json[i] == '[')
         {
-            braces.push(json[i]);
+            braces.push_back(json[i]);
         }
         if (json[i] == ']' && !braces.empty())
         {
-            braces.pop();
+            braces.erase(braces.begin());
         }
     }
 
     return braces.size() == 0;
 }
 
+/// @brief 
+/// @param json 
+/// @param braceType 
+/// @return 
 bool JsonValidator::validateBraces(const std::string& json, BracesType braceType) 
 {
     switch (braceType)
@@ -70,16 +79,25 @@ bool JsonValidator::validateBraces(const std::string& json, BracesType braceType
     }
 }
 
+/// @brief 
+/// @param c 
+/// @return 
 bool JsonValidator::isDigit(char c)
 {
     return '0' <= c && c <= '9';
 }
 
+/// @brief 
+/// @param c 
+/// @return 
 bool JsonValidator::isLetter(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isInteger(const std::string& json) 
 {
     if (json.empty())
@@ -110,6 +128,9 @@ bool JsonValidator::isInteger(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isFloatingPoint(const std::string& json) 
 {
     if (json.empty())
@@ -144,6 +165,9 @@ bool JsonValidator::isFloatingPoint(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isISODateFormat(const std::string& json)
 {
     if(json[4] != '-' || json[7] != '-') {
@@ -152,6 +176,9 @@ bool JsonValidator::isISODateFormat(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isUSADateFormat(const std::string& json)
 {
     if(json[2] != '\\' || json[5] != '\\') {
@@ -160,6 +187,9 @@ bool JsonValidator::isUSADateFormat(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isEURDateFormat(const std::string& json)
 {
     if(json[2] != '.' || json[5] != '.') {
@@ -168,7 +198,9 @@ bool JsonValidator::isEURDateFormat(const std::string& json)
     return true;
 }
 
-// TODO: to think for different date formats validation
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isDate(const std::string& json)
 {
     try {
@@ -218,6 +250,9 @@ bool JsonValidator::isDate(const std::string& json)
     }
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isDatesArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -252,6 +287,9 @@ bool JsonValidator::isDatesArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isIntegersArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -286,6 +324,9 @@ bool JsonValidator::isIntegersArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isFloatingPointsArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -320,10 +361,17 @@ bool JsonValidator::isFloatingPointsArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isNumbersArray(const std::string& json)
 {
     return JsonValidator::isIntegersArray(json) || JsonValidator::isFloatingPointsArray(json);
 }
+
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isStringsArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -360,6 +408,9 @@ bool JsonValidator::isStringsArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isBooleansArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -394,6 +445,9 @@ bool JsonValidator::isBooleansArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isObject(const std::string& json)
 {
     std::string skippedWhites = JsonValidator::skipWhiteSpaces(json);
@@ -406,6 +460,9 @@ bool JsonValidator::isObject(const std::string& json)
     return isValid;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isObjectsArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -438,6 +495,9 @@ bool JsonValidator::isObjectsArray(const std::string& json)
     return true;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
 {
     std::string* newJson = new std::string("");
@@ -457,12 +517,18 @@ std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
     return *newJson;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateAllBraces(const std::string& json) 
 {
     return JsonValidator::validateBraces(json, BracesType::CURLY) 
         && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::isArray(const std::string& json) 
 {
     return JsonValidator::isNumbersArray(json) 
@@ -472,6 +538,9 @@ bool JsonValidator::isArray(const std::string& json)
         || JsonValidator::isDatesArray(json);
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateKeys(const std::string& json) 
 {
     if (json.empty())
@@ -514,15 +583,16 @@ bool JsonValidator::validateKeys(const std::string& json)
         }
         else
         {
-            //isValid = false;
             i++;
-            //break;
         }
     }
 
     return isValid;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateValues(const std::string& json)
 {
     if(json.empty()) {
@@ -595,6 +665,9 @@ bool JsonValidator::validateValues(const std::string& json)
     return isValid;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonValidator::validateSeparators(const std::string& json) 
 {
     if (json.empty())

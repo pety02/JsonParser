@@ -10,7 +10,6 @@
 #include <cmath>
 #include "JsonObject.h"
 
-/// @brief a class that descibes a json parser
 class JsonParser final
 {
 private:
@@ -27,69 +26,25 @@ private:
     bool containsHelper(const std::string, JsonObject*) const; // works
     JsonObject* createFromJsonString(std::string); // works
 public:
-    /// @brief Default constructor
     JsonParser(); // works
-    /// @brief Constructor with a parameter
-    /// @param root an object to be set as root of the json objects array
     JsonParser(const JsonObject&); // works
-    /// @brief Move copy constructor 
-    /// @param other the object that must be copied from
-    JsonParser(JsonParser&&) noexcept; // works
-    /// @brief Copy constructor
-    /// @param other an object to be copied  
+    JsonParser(JsonParser&&) noexcept; // works  
     JsonParser(const JsonParser&); // works
-    /// @brief Assignment operator
-    /// @param other an object to be assigned
-    /// @return a reference to this object
     JsonParser &operator=(const JsonParser&); // works
-    /// @brief Move assignment operator
-    /// @param other an object to be moved
-    /// @return a reference to this object
     JsonParser &operator=(JsonParser&&) noexcept; // works
-    /// @brief Destructor
     ~JsonParser(); // works
 
-    /// @brief checks if a string is a valid json  
-    /// @param json a string to be checked
-    /// @return true if the string is a valid json and false in the other cases
     bool validate(const std::string&) const; // works
-    /// @brief prints a string in json format in an output stream
-    /// @param out the output stream
     void print(std::ostream&) const; // works
-    /// @brief searches all json objects in the json objects array by a definite key 
-    /// @param key the key to search
-    /// @return a vector of JsonObject pointers
     std::vector<JsonObject*> searchBy(const std::string&) const; // works
-    /// @brief checks if json objects array contains a definite value 
-    /// @param value the value to be checked
-    /// @return true if the json objects array contains this value and false in the other cases
     bool contains(std::string) const; // works
-    /// @brief 
-    /// @param  
-    /// @param  
     void setTo(const std::string&, const std::string&); // works
-    /// @brief 
-    /// @param  
-    /// @param  
-    void createPath(const std::string&);
-    /// @brief 
-    /// @param  
-    void deletePath(const std::string&);
-    /// @brief 
-    /// @param  
-    /// @param  
-    void move(const std::string&, std::string&);
-    /// @brief 
-    /// @param  
+    void createPath(const std::string&); // TODO: to implment it
+    void deletePath(const std::string&); // TODO: to implment it
+    void move(const std::string&, std::string&); // TODO: to implment it
     void open(std::string); // works
-    /// @brief 
     int exit(); // works
-    /// @brief 
-    /// @param  
     void save() const; // works
-    /// @brief 
-    /// @param  
-    /// @param  
     void saveAs(const std::string&) const; // works
 };
 

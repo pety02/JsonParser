@@ -1,14 +1,22 @@
 #include "JsonParser.h"
 
+/// @brief 
+/// @param other 
 void JsonParser::copy(const JsonParser& other)
 {
     this->root = other.root;
     this->filename = other.filename;
 }
+
+/// @brief 
 void JsonParser::destroy()
 {
     delete this->root;
 }
+
+/// @brief 
+/// @param value 
+/// @return 
 JsonValueType JsonParser::getType(std::string value) const
 {
     if(JsonValidator::isInteger(value)) {
@@ -31,6 +39,10 @@ JsonValueType JsonParser::getType(std::string value) const
         return JsonValueType::STRING;
     }
 }
+
+/// @brief 
+/// @param root 
+/// @return 
 int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     int newWhiteSpaces = 1;
@@ -48,28 +60,36 @@ int JsonParser::countWhitespaces(const JsonObject &root) const
     
     return newWhiteSpaces;
 }
-std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
-        std::stringstream ss(path);
-        std::string key;
-        JsonObject* parent = nullptr;
-        JsonObject* current = root;
 
-        while (std::getline(ss, key, '/')) {
-            bool found = false;
-            for (JsonObject* child : current->getChildren()) {
-                if (child->getKey() == key) {
-                    parent = current;
-                    current = child;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return {nullptr, nullptr}; // Path does not exist
+/// @brief 
+/// @param path 
+/// @return 
+std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
+    std::stringstream ss(path);
+    std::string key;
+    JsonObject* parent = nullptr;
+    JsonObject* current = root;
+    while (std::getline(ss, key, '/')) {
+        bool found = false;
+        for (JsonObject* child : current->getChildren()) {
+            if (child->getKey() == key) {
+                parent = current;
+                current = child;
+                found = true;
+                break;
             }
         }
-        return {current, parent};
+        if (!found) {
+            return {nullptr, nullptr}; // Path does not exist
+        }
     }
+    return {current, parent};
+}
+
+/// @brief 
+/// @param root 
+/// @param whiteSpaces 
+/// @param out 
 void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out) const
 {
     if (root == nullptr)
@@ -148,24 +168,39 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out
     out << "," << std::endl;
     this->printNode(root->getNext(), whiteSpaces, out);
 }
+
+/// @brief 
 JsonParser::JsonParser()
 {
     this->root = nullptr;
     this->filename = "";
 }
+
+/// @brief 
+/// @param root 
 JsonParser::JsonParser(const JsonObject &root)
 {
     this->root = new JsonObject(root);
 }
+
+/// @brief 
+/// @param other 
 JsonParser::JsonParser(JsonParser &&other) noexcept
 {
     this->copy(other);
     other.root = nullptr;
 }
+
+/// @brief 
+/// @param other 
 JsonParser::JsonParser(const JsonParser &other)
 {
     this->copy(other);
 }
+
+/// @brief 
+/// @param other 
+/// @return 
 JsonParser &JsonParser::operator=(const JsonParser& other)
 {
     if (this != &other)
@@ -176,6 +211,10 @@ JsonParser &JsonParser::operator=(const JsonParser& other)
 
     return *this;
 }
+
+/// @brief 
+/// @param other 
+/// @return 
 JsonParser &JsonParser::operator=(JsonParser &&other) noexcept
 {
     if (this != &other)
@@ -187,10 +226,16 @@ JsonParser &JsonParser::operator=(JsonParser &&other) noexcept
 
     return *this;
 }
+
+/// @brief 
 JsonParser::~JsonParser()
 {
     this->destroy();
 }
+
+/// @brief 
+/// @param json 
+/// @return 
 bool JsonParser::validate(const std::string& json) const
 {
     bool isValid = JsonValidator::isObject(json);
@@ -215,6 +260,9 @@ bool JsonParser::validate(const std::string& json) const
 
     return false;
 }
+
+/// @brief 
+/// @param out 
 void JsonParser::print(std::ostream& out) const
 {
     out << "{" << std::endl;
@@ -223,6 +271,10 @@ void JsonParser::print(std::ostream& out) const
     out << std::endl
               << "}";
 }
+
+/// @brief 
+/// @param key 
+/// @return 
 std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 {
     std::vector<JsonObject*> values = std::vector<JsonObject*>();
@@ -237,10 +289,19 @@ std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 
     return values;
 }
+
+/// @brief 
+/// @param value 
+/// @return 
 bool JsonParser::contains(std::string value) const
 {
     return containsHelper(value, this->root);
 }
+
+/// @brief 
+/// @param value 
+/// @param obj 
+/// @return 
 bool JsonParser::containsHelper(const std::string value, JsonObject *obj) const
 {
     JsonObject* temp = obj;
@@ -301,14 +362,16 @@ bool JsonParser::containsHelper(const std::string value, JsonObject *obj) const
     }
     return false;
 }
+
+/// @brief 
+/// @param allData 
+/// @return 
 JsonObject* JsonParser::createFromJsonString(std::string allData)
 {
-    // There is a validation problem!
     if(!this->validate(allData)) {
         throw std::invalid_argument("Read data not valid json!");
     }
     std::vector<std::string> keys;
-    std::vector<std::vector<std::string>> currObjsKeys;
     std::vector<std::string> currObjKeys, currObjValues;
     std::vector<std::string> values;
     std::string currKey, currValue;
@@ -338,14 +401,9 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
         }
 
         if(!hasChildren) {
-            std::cout << "adding key " << currKey << std::endl;
             keys.push_back(currKey);
             i++;
-        } else {
-            std::cout << "adding subkey " << currKey << std::endl;
-            currObjKeys.push_back(currKey);
-            i++;
-        }
+        } 
         while(allData[i] != '\"' && allData[i] != '[' && allData[i] != '{' && !JsonValidator::isDigit(allData[i])) {
             i++;
         }
@@ -479,9 +537,12 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
         }
     }
 
-    std::cout << "returning an object" << std::endl;
     return newNode;
 }
+
+/// @brief 
+/// @param path 
+/// @param json 
 void JsonParser::setTo(const std::string &path, const std::string &json)
 {
     JsonObject* pathObj = this->createFromJsonString(path);
@@ -500,11 +561,17 @@ void JsonParser::setTo(const std::string &path, const std::string &json)
     JsonObject* newJsonObj = this->createFromJsonString(json);
     readRootObj->setNext(*newJsonObj);
 }
+
+/// @brief 
+/// @param json 
 void JsonParser::createPath(const std::string& json)
 {
     JsonObject* newJsonObj = new JsonObject(json);
     this->root->setNext(*newJsonObj);
 }
+
+/// @brief 
+/// @param path 
 void JsonParser::deletePath(const std::string& path)
 {
     JsonObject* temp = this->root;
@@ -519,6 +586,10 @@ void JsonParser::deletePath(const std::string& path)
         temp->setNext(*this->root->getNext());
     }
 }
+
+/// @brief 
+/// @param fromPath 
+/// @param toPath 
 void JsonParser::move(const std::string& fromPath, std::string& toPath)
 {
     auto [fromNode, fromParent] = findNodeAndParent(fromPath);
@@ -529,11 +600,9 @@ void JsonParser::move(const std::string& fromPath, std::string& toPath)
             return;
         }
 
-        // Swapping the nodes by adjusting the next pointers
         JsonObject* fromNext = fromNode->getNext();
         JsonObject* toNext = toNode->getNext();
 
-        // If fromNode or toNode are direct children of their parents, adjust their parents' child pointers
         if (fromParent) {
             for (JsonObject*& child : fromParent->getChildren()) {
                 if (child == fromNode) {
@@ -552,10 +621,12 @@ void JsonParser::move(const std::string& fromPath, std::string& toPath)
             }
         }
 
-        // Set the next pointers
         fromNode->setNext(*toNext);
         toNode->setNext(*fromNext);
 }
+
+/// @brief 
+/// @param filename 
 void JsonParser::open(std::string filename)
 {
     this->filename = filename; // set the filename to know the current file 
@@ -563,7 +634,7 @@ void JsonParser::open(std::string filename)
     if(!in) {
         throw std::runtime_error("Cannot open the file for writing!");
     }
-    // TODO: to initialize the object with the read data
+
     std::string allData;
     try {
         while(in.good()) {
@@ -580,6 +651,9 @@ void JsonParser::open(std::string filename)
     }
     in.close();
 }
+
+/// @brief 
+/// @return 
 int JsonParser::exit()
 {
     std::cout << std::endl << std::endl << "Would you want to save all changes?" << std::endl << std::endl << "Y/N" << std::endl << "> ";
@@ -595,6 +669,8 @@ int JsonParser::exit()
     }
     return 0;
 }
+
+/// @brief 
 void JsonParser::save() const
 {
     std::ofstream out(this->filename);
@@ -604,13 +680,16 @@ void JsonParser::save() const
     this->print(out);
     out.close();
 }
+
+/// @brief 
+/// @param filename 
 void JsonParser::saveAs(const std::string& filename) const
 {
     std::ofstream out(filename);
     if(!out) {
         throw std::runtime_error("Cannot open the file for writing!");
     }
-    // TODO: to make this path as JsonObject and to save it.
+    
     this->print(out);
     out.close();
 }
