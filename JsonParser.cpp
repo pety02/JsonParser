@@ -376,18 +376,28 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
             if(allData[i] == '{') {
                 currentType = JsonValueType::OBJECT_ARRAY;
                 hasChildren = true;
+                std::vector<JsonObject*> objects = std::vector<JsonObject*>();
                 while(allData[i] != ']') {
-                    if(allData[i] != ',') {
-                        currValue += allData[i++];
-                        currObjValues.push_back(currValue);
-                        currObjsValues.push_back(currObjValues);
-                    
+                    if(allData[i] == '}') {
+                        currValue += allData[i];
+                        JsonObject* currentObject = this->createFromJsonString(currValue);
+                        
+                        objects.push_back(currentObject);
                         currValue = "";
                         i++;
+                        while(allData[i] != '{') {
+                            if(i == allData.length()) {
+                                break;
+                            }
+                            i++;
+                        }
+                    }
+                    if(i == allData.length()) {
                         break;
                     }
                     currValue += allData[i++];
                 }
+                objsVecs.push_back(objects);
                 currObjsValues.push_back(currObjValues);
                 if(newNode == nullptr) {
                     newNode = new JsonObject(currentType, currKey, currValue, objsVecs[nextIndex++], nullptr); 

@@ -17,15 +17,10 @@ class JsonValidator final
 private:
     enum BracesType
     {
-        SIMPLE,
         CURLY,
         STRAIGHT
     };
 
-    /// @brief validates if all simple bracces are put correctly
-    /// @param json text
-    /// @return true if all simple braces are correctly opened and closed and false in the other cases
-    static bool validateSimpleBraces(const std::string&);
     /// @brief validates if all curly bracces are put correctly
     /// @param json text
     /// @return true if all curly braces are correctly opened and closed and false in the other cases

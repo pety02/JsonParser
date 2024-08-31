@@ -1,32 +1,5 @@
 #include "JsonValidator.h"
 
-bool JsonValidator::validateSimpleBraces(const std::string& json)
-{
-    std::vector<char> braces = std::vector<char>();
-    char firstBrace = ' ';
-
-    for (unsigned int i = 0; i < json.length(); ++i)
-    {
-        if (i == 0 && (json[i] == '(' || json[i] == ')'))
-        {
-            firstBrace = json[i];
-            if (firstBrace == ')')
-            {
-                return false;
-            }
-        }
-        if (json[i] == '(')
-        {
-            braces.push_back(json[i]);
-        }
-        if (json[i] == ')' && !braces.empty())
-        {
-            braces.pop_back();
-        }
-    }
-
-    return braces.size() == 0;
-}
 
 bool JsonValidator::validateCurlyBraces(const std::string& json)
 {
@@ -58,7 +31,7 @@ bool JsonValidator::validateCurlyBraces(const std::string& json)
 
 bool JsonValidator::validateStraightBraces(const std::string& json)
 {
-    std::vector<char> braces = std::vector<char>();
+    std::stack<char> braces = std::stack<char>();
     char firstBrace = ' ';
 
     for (unsigned int i = 0; i < json.length(); ++i)
@@ -73,11 +46,11 @@ bool JsonValidator::validateStraightBraces(const std::string& json)
         }
         if (json[i] == '[')
         {
-            braces.push_back(json[i]);
+            braces.push(json[i]);
         }
         if (json[i] == ']' && !braces.empty())
         {
-            braces.pop_back();
+            braces.pop();
         }
     }
 
@@ -88,8 +61,6 @@ bool JsonValidator::validateBraces(const std::string& json, BracesType braceType
 {
     switch (braceType)
     {
-        case BracesType::SIMPLE:
-            return JsonValidator::validateSimpleBraces(json);
         case BracesType::CURLY:
             return JsonValidator::validateCurlyBraces(json);
         case BracesType::STRAIGHT:
@@ -488,8 +459,7 @@ std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
 
 bool JsonValidator::validateAllBraces(const std::string& json) 
 {
-    return /*JsonValidator::validateBraces(json, BracesType::SIMPLE)
-        &&*/ JsonValidator::validateBraces(json, BracesType::CURLY) 
+    return JsonValidator::validateBraces(json, BracesType::CURLY) 
         && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
 }
 
@@ -544,8 +514,9 @@ bool JsonValidator::validateKeys(const std::string& json)
         }
         else
         {
-            isValid = false;
-            break;
+            //isValid = false;
+            i++;
+            //break;
         }
     }
 
