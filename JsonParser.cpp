@@ -590,8 +590,8 @@ void JsonParser::setTo(const std::string &path, const std::string &json)
 /// @author Petya Licheva - pety02
 void JsonParser::createPath(const std::string& json)
 {
-    JsonObject* newJsonObj = new JsonObject(json);
-    this->root->setNext(*newJsonObj);
+    //JsonObject* newJsonObj = new JsonObject(json);
+    //this->root->setNext(*newJsonObj);
 }
 
 /// @brief 
@@ -599,7 +599,7 @@ void JsonParser::createPath(const std::string& json)
 /// @author Petya Licheva - pety02
 void JsonParser::deletePath(const std::string& path)
 {
-    JsonObject* temp = this->root;
+    /*JsonObject* temp = this->root;
     JsonObject* pathJsonObj = new JsonObject(path);
     while(temp->getNext()) {
         if(temp == pathJsonObj) {
@@ -609,7 +609,7 @@ void JsonParser::deletePath(const std::string& path)
             break;
         }
         temp->setNext(*this->root->getNext());
-    }
+    }*/
 }
 
 /// @brief 

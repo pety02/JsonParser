@@ -24,57 +24,11 @@ void JsonObject::destroy()
     delete this->next;
 }
 
-/// @brief Constructor with a string in json format
-/// @param json a string in json format that represent an object
+/// @brief Default constructor of JsonObject class
 /// @author Petya Licheva - pety02
-JsonObject::JsonObject(const std::string& json)
+JsonObject::JsonObject() : valueType(JsonValueType::STRING), key(""), value(""), 
+    next(nullptr), children(std::vector<JsonObject*>())
 {
-    std::string key, value, read;
-    for(unsigned int i = 1; i < json.length();) {
-        do {
-            read += json[i++];
-        } while (json[i] != '\"');
-        read = json[i];
-        do {
-            read += json[i++];
-        } while (json[i] != ':');
-        this->key = read.substr(1, read.length() - 1);
-        read = "";
-        do {
-            read += json[i++];
-        } while (json[i] != '\"');
-        read = json[i];
-        do {
-            read += json[i++];
-        } while (json[i] != ',' && json[i] != '\n');
-        this->value = read.substr(1, read.length() - 1);
-        if(JsonValidator::isObject(this->value) && this->value != "null") {
-            this->valueType = JsonValueType::OBJECT;
-        } else if (JsonValidator::isNumbersArray(this->value) 
-                || JsonValidator::isBooleansArray(this->value) 
-                || JsonValidator::isStringsArray(this->value)) {
-            this->valueType = JsonValueType::VALUE_ARRAY;
-        } else if (JsonValidator::isObjectsArray(this->value)) {
-            this->valueType = JsonValueType::OBJECT_ARRAY;
-        } else if (JsonValidator::isInteger(this->value)) {
-            this->valueType = JsonValueType::INT;
-        } else if (JsonValidator::isFloatingPoint(this->value)) {
-            this->valueType = JsonValueType::DOUBLE;
-        } else if(JsonValidator::isDate(this->value)) {
-            this->valueType = JsonValueType::DATE;
-        } else if (this->value == "true" || this->value == "false") {
-            this->valueType = JsonValueType::BOOLEAN;
-        } else if (this->value == "null") {
-            this->valueType = JsonValueType::NULL_VALUE;
-        } else {
-            this->valueType = JsonValueType::STRING;
-        }
-        if(json[i] == '\n') {
-            this->next = nullptr;
-        } else {
-            this->next = new JsonObject(json.substr(i, json.length()));
-        }
-    }
 }
 
 /// @brief Constructor with all arguments
@@ -102,6 +56,16 @@ JsonObject::JsonObject(const JsonObject &other)
     this->copy(other);
 }
 
+/// @brief Move copy constructor of JsonObject
+/// @param other the copied JsonObject
+/// @author Petya Licheva - pety02
+JsonObject::JsonObject(JsonObject &&other) noexcept
+{
+    this->copy(other);
+    other.children.clear();
+    other.next = nullptr;
+}
+
 /// @brief Assignment operator of JsonObject
 /// @param other the assigned JsonObject
 /// @return a refernce to current JsonObject
@@ -115,6 +79,32 @@ JsonObject &JsonObject::operator=(const JsonObject &other)
     }
 
     return *this;
+}
+
+/// @brief Assignement operator== for comparison of JsonObjects
+/// @param left the left JsonObject
+/// @param right the right JsonObject
+/// @return true if the left JsonObject is equal to the 
+///         right JsonObject and false if not
+/// @author Petya Licheva - pety02
+JsonObject &JsonObject::operator=(JsonObject &&other) noexcept
+{
+    if (this != &other)
+    {
+        this->destroy();
+        this->copy(other);
+        other.children.clear();
+        other.next = nullptr;
+    }
+
+    return *this;
+}
+
+/// @brief Destroys the current JsonObject
+/// @author Petya Licheva - pety02
+JsonObject::~JsonObject()
+{
+    this->destroy();
 }
 
 /// @brief Operator== for comparison of JsonObjects
@@ -150,13 +140,6 @@ bool operator==(const JsonObject &left, const JsonObject &right)
 bool operator!=(const JsonObject &left, const JsonObject &right)
 {
     return left.key != right.key && left.value != right.value;
-}
-
-/// @brief Destroys the current JsonObject
-/// @author Petya Licheva - pety02
-JsonObject::~JsonObject()
-{
-    this->destroy();
 }
 
 /// @brief a method that sets the next JsonObject

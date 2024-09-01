@@ -19,19 +19,20 @@ private:
     void copy(const JsonObject &);
     void destroy();
 public:
-    JsonObject() = default;
-    JsonObject(const std::string&);
+    JsonObject();
     JsonObject(JsonValueType, const std::string&, const std::string&, std::vector<JsonObject*>,  JsonObject*);
     JsonObject(const JsonObject&);
+    JsonObject(JsonObject&&) noexcept;
     JsonObject& operator=(const JsonObject&);
+    JsonObject& operator=(JsonObject&&) noexcept;
+    ~JsonObject();
+
     friend bool operator==(const JsonObject&, const JsonObject&);
     friend bool operator!=(const JsonObject &, const JsonObject&);
-    ~JsonObject();
 
     void setNext(const JsonObject&);
     void add(const JsonObject&);
     void remove(const JsonObject&);
-
     JsonValueType getType() const;
     std::string getKey() const;
     std::string getValue() const;
