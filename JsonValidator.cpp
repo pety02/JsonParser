@@ -1,8 +1,9 @@
 #include "JsonValidator.h"
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the curly braces in the json string
+/// @param json the definite json string
+/// @return true if the json string contains valid curly braces and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateCurlyBraces(const std::string& json)
 {
     std::vector<char> braces = std::vector<char>();
@@ -31,9 +32,10 @@ bool JsonValidator::validateCurlyBraces(const std::string& json)
     return braces.size() == 0;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the straight braces in the json string
+/// @param json the definite json string
+/// @return true if the json string contains valid straight braces and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateStraightBraces(const std::string& json)
 {
     std::vector<char> braces = std::vector<char>();
@@ -62,10 +64,11 @@ bool JsonValidator::validateStraightBraces(const std::string& json)
     return braces.size() == 0;
 }
 
-/// @brief 
-/// @param json 
-/// @param braceType 
-/// @return 
+/// @brief validates the braces in the json string
+/// @param json the definite json string
+/// @param braceType the type of the braces
+/// @return true if the json string contains valid braces and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateBraces(const std::string& json, BracesType braceType) 
 {
     switch (braceType)
@@ -79,25 +82,28 @@ bool JsonValidator::validateBraces(const std::string& json, BracesType braceType
     }
 }
 
-/// @brief 
-/// @param c 
-/// @return 
+/// @brief validates that the char c is digit
+/// @param c the definite char c
+/// @return true if the char c is digit and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isDigit(char c)
 {
     return '0' <= c && c <= '9';
 }
 
-/// @brief 
-/// @param c 
-/// @return 
+/// @brief validates that the char c is letter
+/// @param c the definite char c
+/// @return true if the char c is letter and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isLetter(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an integer
+/// @param json the definite json string
+/// @return true if the json string is an integer and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isInteger(const std::string& json) 
 {
     if (json.empty())
@@ -128,9 +134,10 @@ bool JsonValidator::isInteger(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a floating point number
+/// @param json the definite json string
+/// @return true if the definite json string is a floating point number and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isFloatingPoint(const std::string& json) 
 {
     if (json.empty())
@@ -165,9 +172,10 @@ bool JsonValidator::isFloatingPoint(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an ISO date
+/// @param json the definite json string
+/// @return true if the definite json string is an ISO date and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isISODateFormat(const std::string& json)
 {
     if(json[4] != '-' || json[7] != '-') {
@@ -176,9 +184,10 @@ bool JsonValidator::isISODateFormat(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an USA date
+/// @param json the definite json string
+/// @return true if the definite json string is an USA date and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isUSADateFormat(const std::string& json)
 {
     if(json[2] != '\\' || json[5] != '\\') {
@@ -187,9 +196,10 @@ bool JsonValidator::isUSADateFormat(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an EUR date
+/// @param json the definite json string
+/// @return true if the definite json string is an EUR date and false if not
+/// @author Petya Licheva - pety02 
 bool JsonValidator::isEURDateFormat(const std::string& json)
 {
     if(json[2] != '.' || json[5] != '.') {
@@ -198,9 +208,10 @@ bool JsonValidator::isEURDateFormat(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a date
+/// @param json the definite json string
+/// @return true if the definite json string is a date and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isDate(const std::string& json)
 {
     try {
@@ -250,9 +261,10 @@ bool JsonValidator::isDate(const std::string& json)
     }
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a date array
+/// @param json the definite json string
+/// @return true if the definite json string is a date array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isDatesArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -287,9 +299,10 @@ bool JsonValidator::isDatesArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an integer array
+/// @param json the definite json string
+/// @return true if the definite json string is an integer array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isIntegersArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -324,9 +337,10 @@ bool JsonValidator::isIntegersArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a floting points array
+/// @param json the definite json string
+/// @return true if the definite json string is a floating points array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isFloatingPointsArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -361,17 +375,19 @@ bool JsonValidator::isFloatingPointsArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a number array
+/// @param json the definite json string
+/// @return true if the definite json string is a number array and false if not
+/// @author Petya Licheva - pety02 
 bool JsonValidator::isNumbersArray(const std::string& json)
 {
     return JsonValidator::isIntegersArray(json) || JsonValidator::isFloatingPointsArray(json);
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a string array
+/// @param json the definite json string
+/// @return true if the definite json string is a string array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isStringsArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -408,9 +424,10 @@ bool JsonValidator::isStringsArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is a boolean array
+/// @param json the definite json string
+/// @return true if the definite json string is a boolean array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isBooleansArray(const std::string& json)
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -445,9 +462,10 @@ bool JsonValidator::isBooleansArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an object
+/// @param json the definite json string
+/// @return true if the definite json string is an object and false if not
+/// @author Petya Licheva - pety02 
 bool JsonValidator::isObject(const std::string& json)
 {
     std::string skippedWhites = JsonValidator::skipWhiteSpaces(json);
@@ -460,9 +478,10 @@ bool JsonValidator::isObject(const std::string& json)
     return isValid;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an objects array
+/// @param json the definite json string
+/// @return true if the definite json string is an objects array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isObjectsArray(const std::string& json) 
 {
     if (json[0] != '[' || json[json.length() - 1] != ']')
@@ -495,9 +514,10 @@ bool JsonValidator::isObjectsArray(const std::string& json)
     return true;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief skips all whiteSpaces in the json string 
+/// @param json the definite json string
+/// @return the json string with the skipped whiteSpaces
+/// @author Petya Licheva - pety02
 std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
 {
     std::string* newJson = new std::string("");
@@ -517,18 +537,20 @@ std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
     return *newJson;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the all braces in the json string
+/// @param json the definite json string
+/// @return true if in the definite json string all braces are valid and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateAllBraces(const std::string& json) 
 {
     return JsonValidator::validateBraces(json, BracesType::CURLY) 
         && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates the json string is an array
+/// @param json the definite json string
+/// @return true if the definite json string is an array and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::isArray(const std::string& json) 
 {
     return JsonValidator::isNumbersArray(json) 
@@ -538,9 +560,10 @@ bool JsonValidator::isArray(const std::string& json)
         || JsonValidator::isDatesArray(json);
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates all keys in the json string are valid
+/// @param json the definite json string
+/// @return true if the all keys in the json string are valid and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateKeys(const std::string& json) 
 {
     if (json.empty())
@@ -590,9 +613,10 @@ bool JsonValidator::validateKeys(const std::string& json)
     return isValid;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates all values in the json string are valid
+/// @param json the definite json string
+/// @return true if the all values in the json string are valid and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateValues(const std::string& json)
 {
     if(json.empty()) {
@@ -665,9 +689,10 @@ bool JsonValidator::validateValues(const std::string& json)
     return isValid;
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief validates all separators in the json string are valid
+/// @param json the definite json string
+/// @return true if the all separators in the json string are valid and false if not
+/// @author Petya Licheva - pety02
 bool JsonValidator::validateSeparators(const std::string& json) 
 {
     if (json.empty())
