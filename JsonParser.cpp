@@ -1,22 +1,25 @@
 #include "JsonParser.h"
 
-/// @brief 
-/// @param other 
+/// @brief a method that copies a definite JsonParser object
+/// @param other the copied JsonParser object
+/// @author Petya Licheva - pety02
 void JsonParser::copy(const JsonParser& other)
 {
     this->root = other.root;
     this->filename = other.filename;
 }
 
-/// @brief 
+/// @brief a method that destroys the current JsonParser object
+/// @author Petya Licheva - pety02
 void JsonParser::destroy()
 {
     delete this->root;
 }
 
-/// @brief 
-/// @param value 
-/// @return 
+/// @brief a method that returns the type of a definite JsonObject by its value validation
+/// @param value the value of a JsonObject
+/// @return the type of a definite JsonObject by its value validation
+/// @author Petya Licheva - pety02
 JsonValueType JsonParser::getType(std::string value) const
 {
     if(JsonValidator::isInteger(value)) {
@@ -40,9 +43,10 @@ JsonValueType JsonParser::getType(std::string value) const
     }
 }
 
-/// @brief 
-/// @param root 
-/// @return 
+/// @brief a method that counts the whitespaces needed for pretty print of the JsonObject
+/// @param root the definite JsonObject
+/// @return the count of the whitespaces needed for pretty print of the JsonObject
+/// @author Petya Licheva - pety02
 int JsonParser::countWhitespaces(const JsonObject &root) const
 {
     int newWhiteSpaces = 1;
@@ -50,20 +54,21 @@ int JsonParser::countWhitespaces(const JsonObject &root) const
         if(root.getNext() != nullptr) {
             newWhiteSpaces = std::min(root.getNext()->getKey().length(), root.getKey().length()) + 1;
         } else {
-            newWhiteSpaces = 11;
+            newWhiteSpaces = root.getKey().length() + 1;
         }
     } else if(root.getValue() != "") {
-        newWhiteSpaces = 10;
+        newWhiteSpaces = root.getKey().length() + 1;
     } else if(root.getValue() == "" && root.getType() == JsonValueType::OBJECT) {
-        newWhiteSpaces = 12;
+        newWhiteSpaces = std::min(root.getNext()->getKey().length(), root.getKey().length()) + 3;
     }
     
     return newWhiteSpaces;
 }
 
-/// @brief 
-/// @param path 
-/// @return 
+/// @brief a method that finds a node and its parent by a definite path
+/// @param path the definite path
+/// @return the node and its parent that stays on the definite path
+/// @author Petya Licheva - pety02
 std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::string& path) {
     std::stringstream ss(path);
     std::string key;
@@ -86,10 +91,11 @@ std::pair<JsonObject*, JsonObject*> JsonParser::findNodeAndParent(const std::str
     return {current, parent};
 }
 
-/// @brief 
-/// @param root 
-/// @param whiteSpaces 
-/// @param out 
+/// @brief a method that prints a node of JsonObject class
+/// @param root the node of JsonObject class
+/// @param whiteSpaces the count of needed whitespaces for pretty ptint
+/// @param out the ostream in which the JsonObject will be printted
+/// @author Petya Licheva - pety02
 void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out) const
 {
     if (root == nullptr)
@@ -169,38 +175,43 @@ void JsonParser::printNode(JsonObject* root, int& whiteSpaces, std::ostream& out
     this->printNode(root->getNext(), whiteSpaces, out);
 }
 
-/// @brief 
+/// @brief Default constructor of JsonParser class
+/// @author Petya Licheva - pety02
 JsonParser::JsonParser()
 {
     this->root = nullptr;
     this->filename = "";
 }
 
-/// @brief 
-/// @param root 
+/// @brief Constructor with one parameter of JsonParser class
+/// @param root the root JsonObject class's object
+/// @author Petya Licheva - pety02
 JsonParser::JsonParser(const JsonObject &root)
 {
     this->root = new JsonObject(root);
 }
 
-/// @brief 
-/// @param other 
+/// @brief Move copy constructor of JsonParser class
+/// @param other the moved JsonParser object
+/// @author Petya Licheva - pety02
 JsonParser::JsonParser(JsonParser &&other) noexcept
 {
     this->copy(other);
     other.root = nullptr;
 }
 
-/// @brief 
-/// @param other 
+/// @brief Copy constructor of JsonParser class
+/// @param root the copied JsonParser object
+/// @author Petya Licheva - pety02
 JsonParser::JsonParser(const JsonParser &other)
 {
     this->copy(other);
 }
 
-/// @brief 
-/// @param other 
-/// @return 
+/// @brief Assignment operator of JsonParser class 
+/// @param other the assigned JsonParser object
+/// @return a reference to the current JsonParser
+/// @author Petya Licheva - pety02
 JsonParser &JsonParser::operator=(const JsonParser& other)
 {
     if (this != &other)
@@ -212,9 +223,10 @@ JsonParser &JsonParser::operator=(const JsonParser& other)
     return *this;
 }
 
-/// @brief 
-/// @param other 
-/// @return 
+/// @brief Move assignment operator of JsonParser class 
+/// @param other the assigned JsonParser object
+/// @return a reference to the current JsonParser
+/// @author Petya Licheva - pety02
 JsonParser &JsonParser::operator=(JsonParser &&other) noexcept
 {
     if (this != &other)
@@ -227,15 +239,18 @@ JsonParser &JsonParser::operator=(JsonParser &&other) noexcept
     return *this;
 }
 
-/// @brief 
+/// @brief Destructor of JsonParser class
+/// @author Petya Licheva - pety02
 JsonParser::~JsonParser()
 {
     this->destroy();
 }
 
-/// @brief 
-/// @param json 
-/// @return 
+/// @brief a validation method of a definite json string
+/// @param json the definite json string
+/// @return true if the string is in valid json format
+/// @throw std::invalid_argument with a custom message if the json string is not valid 
+/// @author Petya Licheva - pety02
 bool JsonParser::validate(const std::string& json) const
 {
     bool isValid = JsonValidator::isObject(json);
@@ -258,11 +273,12 @@ bool JsonParser::validate(const std::string& json) const
         throw std::invalid_argument("Separators error: Please, check if all separators are put on the right place!");
     }
 
-    return false;
+    throw std::invalid_argument("Invalid json string!");
 }
 
-/// @brief 
-/// @param out 
+/// @brief Prints the current JsonObject with a pretty print
+/// @param out the ostream in which the current JsonObject will be printted
+/// @author Petya Licheva - pety02
 void JsonParser::print(std::ostream& out) const
 {
     out << "{" << std::endl;
@@ -272,9 +288,10 @@ void JsonParser::print(std::ostream& out) const
               << "}";
 }
 
-/// @brief 
-/// @param key 
-/// @return 
+/// @brief a methot that searches JsonObjects by a definite key
+/// @param key the definite key
+/// @return a vector of found JsonObjects
+/// @author Petya Licheva - pety02
 std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
 {
     std::vector<JsonObject*> values = std::vector<JsonObject*>();
@@ -290,18 +307,20 @@ std::vector<JsonObject*> JsonParser::searchBy(const std::string& key) const
     return values;
 }
 
-/// @brief 
-/// @param value 
-/// @return 
+/// @brief a method that checks if a value is contained in the current JsonObject
+/// @param value the checked value
+/// @return true if the current JsonObject contains this value and false if not
+/// @author Petya Licheva - pety02
 bool JsonParser::contains(std::string value) const
 {
     return containsHelper(value, this->root);
 }
 
-/// @brief 
-/// @param value 
-/// @param obj 
-/// @return 
+/// @brief a helper method that do the checks for the contains method
+/// @param value the checked value
+/// @param obj the JsonObject in which checks for this value
+/// @return true if the current JsonObject contains this value and false if not
+/// @author Petya Licheva - pety02
 bool JsonParser::containsHelper(const std::string value, JsonObject *obj) const
 {
     JsonObject* temp = obj;
@@ -363,9 +382,11 @@ bool JsonParser::containsHelper(const std::string value, JsonObject *obj) const
     return false;
 }
 
-/// @brief 
-/// @param allData 
-/// @return 
+/// @brief a method that initializes a JsonObject of a definite string
+/// @param allData the definite string
+/// @return the initilized JsonObject
+/// @throw std::invalid_argument with a custom message on invalid json string format
+/// @author Petya Licheva - pety02
 JsonObject* JsonParser::createFromJsonString(std::string allData)
 {
     if(!this->validate(allData)) {
@@ -540,9 +561,11 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
     return newNode;
 }
 
-/// @brief 
-/// @param path 
-/// @param json 
+/// @brief a method that sets a JsonObject on a definite path
+/// @param path the definite path
+/// @param json the JsonObject as string
+/// @throw std::runtime_error with a custom message if the path is not found
+/// @author Petya Licheva - pety02
 void JsonParser::setTo(const std::string &path, const std::string &json)
 {
     JsonObject* pathObj = this->createFromJsonString(path);
@@ -564,6 +587,7 @@ void JsonParser::setTo(const std::string &path, const std::string &json)
 
 /// @brief 
 /// @param json 
+/// @author Petya Licheva - pety02
 void JsonParser::createPath(const std::string& json)
 {
     JsonObject* newJsonObj = new JsonObject(json);
@@ -572,6 +596,7 @@ void JsonParser::createPath(const std::string& json)
 
 /// @brief 
 /// @param path 
+/// @author Petya Licheva - pety02
 void JsonParser::deletePath(const std::string& path)
 {
     JsonObject* temp = this->root;
@@ -590,6 +615,7 @@ void JsonParser::deletePath(const std::string& path)
 /// @brief 
 /// @param fromPath 
 /// @param toPath 
+/// @author Petya Licheva - pety02
 void JsonParser::move(const std::string& fromPath, std::string& toPath)
 {
     auto [fromNode, fromParent] = findNodeAndParent(fromPath);
@@ -625,8 +651,11 @@ void JsonParser::move(const std::string& fromPath, std::string& toPath)
         toNode->setNext(*fromNext);
 }
 
-/// @brief 
-/// @param filename 
+/// @brief a method that opens a file by its filename and initialize the current 
+///        JsonObject via the createFromJsonString method
+/// @param filename the definite filenme 
+/// @throw std::runtime_error with a custom message if the file cannot be opened
+/// @author Petya Licheva - pety02
 void JsonParser::open(std::string filename)
 {
     this->filename = filename; // set the filename to know the current file 
@@ -652,37 +681,51 @@ void JsonParser::open(std::string filename)
     in.close();
 }
 
-/// @brief 
-/// @return 
+/// @brief a method that asks the user of he/she want to save the changes and if the user wants
+///       then the method save them and exit the progam, if not the method only exit the program
+/// @return the exit code of the program (0 on success and, -1 on exception)
+/// @author Petya Licheva - pety02
 int JsonParser::exit()
 {
-    std::cout << std::endl << std::endl << "Would you want to save all changes?" << std::endl << std::endl << "Y/N" << std::endl << "> ";
+    std::cout << std::endl << std::endl << "Would you want to save all changes?" 
+        << std::endl << std::endl << "Y/N" << std::endl << "> ";
     char option;
     do {
         std::cin >> option;
     } while (option != 'Y' && option != 'N');
 
     if(option == 'Y') {
-        this->save();
+        try {
+            if(this->filename == "") {
+                std::cout << "Enter filename: ";
+                std::cin >> this->filename;
+            }
+            this->save();
+        } catch (std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            return -1;
+        }
     } else {
-        this->open(this->filename);
+        return 0;   
     }
-    return 0;
 }
 
-/// @brief 
+/// @brief a method that saves the current JsonObject in the current file 
+/// @throw std::runtime_error with a custom message when the file cannot be oppened
+/// @author Petya Licheva - pety02
 void JsonParser::save() const
 {
-    std::ofstream out(this->filename);
-    if(!out) {
-        throw std::runtime_error("Cannot open the file for writing!");
+    try {
+        this->saveAs(this->filename);
+    } catch (std::exception&) {
+        throw;
     }
-    this->print(out);
-    out.close();
 }
 
-/// @brief 
-/// @param filename 
+/// @brief a method that saves the current JsonObject in a definite file
+/// @param filename the definite file's filename
+/// @throw std::runtime_error with a custom message when the file cannot be oppened
+/// @author Petya Licheva - pety02
 void JsonParser::saveAs(const std::string& filename) const
 {
     std::ofstream out(filename);

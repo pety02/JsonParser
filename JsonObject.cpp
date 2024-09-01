@@ -1,6 +1,6 @@
 #include "JsonObject.h"
 
-/// @brief Copy constructor of JsonObject class
+/// @brief a method that copies a definite JsonObject
 /// @param other the copied object
 /// @author Petya Licheva - pety02
 void JsonObject::copy(const JsonObject &other)
@@ -16,7 +16,7 @@ void JsonObject::copy(const JsonObject &other)
     }
 }
 
-/// @brief Destroying the object
+/// @brief a method that destroys the current JsonObject
 /// @author Petya Licheva - pety02
 void JsonObject::destroy()
 {
