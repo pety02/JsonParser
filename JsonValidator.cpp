@@ -1,5 +1,46 @@
 #include "JsonValidator.h"
 
+/// @brief skips all whiteSpaces in the json string 
+/// @param json the definite json string
+/// @return the json string with the skipped whiteSpaces
+/// @author Petya Licheva - pety02
+std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
+{
+    std::string* newJson = new std::string("");
+    for(size_t i = 0; i < json.length();) {
+        if(json[i] == '\"') {
+            do {
+                newJson->push_back(json[i++]);
+            } while (json[i] == '\"');
+        }
+        if(json[i] == ' ') {
+            i++;
+            continue;
+        }
+
+        newJson->push_back(json[i++]);
+    }
+    return *newJson;
+}
+
+/// @brief validates that the char c is digit
+/// @param c the definite char c
+/// @return true if the char c is digit and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isDigit(char c)
+{
+    return '0' <= c && c <= '9';
+}
+
+/// @brief validates that the char c is letter
+/// @param c the definite char c
+/// @return true if the char c is letter and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isLetter(char c)
+{
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+}
+
 /// @brief validates the curly braces in the json string
 /// @param json the definite json string
 /// @return true if the json string contains valid curly braces and false if not
@@ -82,22 +123,14 @@ bool JsonValidator::validateBraces(const std::string& json, BracesType braceType
     }
 }
 
-/// @brief validates that the char c is digit
-/// @param c the definite char c
-/// @return true if the char c is digit and false if not
+/// @brief validates the all braces in the json string
+/// @param json the definite json string
+/// @return true if in the definite json string all braces are valid and false if not
 /// @author Petya Licheva - pety02
-bool JsonValidator::isDigit(char c)
+bool JsonValidator::validateAllBraces(const std::string& json) 
 {
-    return '0' <= c && c <= '9';
-}
-
-/// @brief validates that the char c is letter
-/// @param c the definite char c
-/// @return true if the char c is letter and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isLetter(char c)
-{
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    return JsonValidator::validateBraces(json, BracesType::CURLY) 
+        && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
 }
 
 /// @brief validates the json string is an integer
@@ -261,207 +294,6 @@ bool JsonValidator::isDate(const std::string& json)
     }
 }
 
-/// @brief validates the json string is a date array
-/// @param json the definite json string
-/// @return true if the definite json string is a date array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isDatesArray(const std::string& json)
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    std::string readed = "";
-    for (unsigned int i = 0; i < values.length();)
-    {
-        while (values[i] == ' ')
-        {
-            i++;
-        }
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed += values[i++];
-        } while (values[i] != ',');
-        ++i;
-        if (!JsonValidator::isDate(readed))
-        {
-            return false;
-        }
-        readed = "";
-    }
-
-    return true;
-}
-
-/// @brief validates the json string is an integer array
-/// @param json the definite json string
-/// @return true if the definite json string is an integer array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isIntegersArray(const std::string& json) 
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    std::string readed = "";
-    for (unsigned int i = 0; i < values.length();)
-    {
-        while (values[i] == ' ')
-        {
-            i++;
-        }
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed += values[i++];
-        } while (values[i] != ',');
-        ++i;
-        if (json[i] != '-' && !JsonValidator::isInteger(readed))
-        {
-            return false;
-        }
-        readed = "";
-    }
-
-    return true;
-}
-
-/// @brief validates the json string is a floting points array
-/// @param json the definite json string
-/// @return true if the definite json string is a floating points array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isFloatingPointsArray(const std::string& json) 
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    std::string readed = "";
-    for (unsigned int i = 0; i < values.length();)
-    {
-        while (values[i] == ' ')
-        {
-            i++;
-        }
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed += values[i++];
-        } while (values[i] != ',');
-        ++i;
-        if (!JsonValidator::isFloatingPoint(readed))
-        {
-            return false;
-        }
-        readed = "";
-    }
-
-    return true;
-}
-
-/// @brief validates the json string is a number array
-/// @param json the definite json string
-/// @return true if the definite json string is a number array and false if not
-/// @author Petya Licheva - pety02 
-bool JsonValidator::isNumbersArray(const std::string& json)
-{
-    return JsonValidator::isIntegersArray(json) || JsonValidator::isFloatingPointsArray(json);
-}
-
-/// @brief validates the json string is a string array
-/// @param json the definite json string
-/// @return true if the definite json string is a string array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isStringsArray(const std::string& json)
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    char *readed = new char[values.length()];
-    unsigned int readFrom = 0;
-    for (unsigned int i = 0; i < values.length();)
-    {
-        while (values[i] == ' ')
-        {
-            i++;
-        }
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed[readFrom++] = values[i++];
-        } while (values[i] != ',');
-        ++i;
-        if (readed[0] != '\"' || readed[readFrom - 1] != '\"')
-        {
-            return false;
-        }
-        readed = new char[values.length()];
-        readFrom = 0;
-    }
-
-    return true;
-}
-
-/// @brief validates the json string is a boolean array
-/// @param json the definite json string
-/// @return true if the definite json string is a boolean array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isBooleansArray(const std::string& json)
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    std::string readed = "";
-    for (unsigned int i = 0; i < values.length();)
-    {
-        while (!JsonValidator::isLetter(json[i]))
-        {
-            i++;
-        }
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed += values[i++];
-        } while (values[i] != ',');
-        i++;
-        if (readed != "true" && readed != "false")
-        {
-            return false;
-        }
-        readed = "";
-    }
-
-    return true;
-}
-
 /// @brief validates the json string is an object
 /// @param json the definite json string
 /// @return true if the definite json string is an object and false if not
@@ -476,88 +308,6 @@ bool JsonValidator::isObject(const std::string& json)
         && JsonValidator::validateValues(skippedWhites));
 
     return isValid;
-}
-
-/// @brief validates the json string is an objects array
-/// @param json the definite json string
-/// @return true if the definite json string is an objects array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isObjectsArray(const std::string& json) 
-{
-    if (json[0] != '[' || json[json.length() - 1] != ']')
-    {
-        return false;
-    }
-    unsigned int size = json.length();
-    std::string values = json.substr(1, size - 2);
-    char *readed = new char[values.length()];
-    unsigned int readFrom = 0;
-    for (unsigned int i = 0; i < values.length();)
-    {
-        do
-        {
-            if (values[i] == '\0')
-            {
-                break;
-            }
-            readed[readFrom++] = values[i++];
-        } while (values[i] != ',');
-        std::string readedAsString = readed;
-        if (!JsonValidator::isObject(readedAsString) && readedAsString != "null")
-        {
-            return false;
-        }
-        readed = new char[values.length()];
-        readFrom = 0;
-    }
-
-    return true;
-}
-
-/// @brief skips all whiteSpaces in the json string 
-/// @param json the definite json string
-/// @return the json string with the skipped whiteSpaces
-/// @author Petya Licheva - pety02
-std::string& JsonValidator::skipWhiteSpaces(const std::string& json)
-{
-    std::string* newJson = new std::string("");
-    for(size_t i = 0; i < json.length();) {
-        if(json[i] == '\"') {
-            do {
-                newJson->push_back(json[i++]);
-            } while (json[i] == '\"');
-        }
-        if(json[i] == ' ') {
-            i++;
-            continue;
-        }
-
-        newJson->push_back(json[i++]);
-    }
-    return *newJson;
-}
-
-/// @brief validates the all braces in the json string
-/// @param json the definite json string
-/// @return true if in the definite json string all braces are valid and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::validateAllBraces(const std::string& json) 
-{
-    return JsonValidator::validateBraces(json, BracesType::CURLY) 
-        && JsonValidator::validateBraces(json, BracesType::STRAIGHT);
-}
-
-/// @brief validates the json string is an array
-/// @param json the definite json string
-/// @return true if the definite json string is an array and false if not
-/// @author Petya Licheva - pety02
-bool JsonValidator::isArray(const std::string& json) 
-{
-    return JsonValidator::isNumbersArray(json) 
-        || JsonValidator::isStringsArray(json) 
-        || JsonValidator::isBooleansArray(json) 
-        || JsonValidator::isObjectsArray(json)
-        || JsonValidator::isDatesArray(json);
 }
 
 /// @brief validates all keys in the json string are valid
@@ -751,4 +501,254 @@ bool JsonValidator::validateSeparators(const std::string& json)
     }
 
     return separatorsCount + 1 == keyValuePairsCount || keyValuePairsCount == separatorsCount;
+}
+
+/// @brief validates the json string is an integer array
+/// @param json the definite json string
+/// @return true if the definite json string is an integer array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isIntegersArray(const std::string& json) 
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    std::string readed = "";
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (values[i] == ' ')
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed += values[i++];
+        } while (values[i] != ',');
+        ++i;
+        if (json[i] != '-' && !JsonValidator::isInteger(readed))
+        {
+            return false;
+        }
+        readed = "";
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is a floting points array
+/// @param json the definite json string
+/// @return true if the definite json string is a floating points array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isFloatingPointsArray(const std::string& json) 
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    std::string readed = "";
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (values[i] == ' ')
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed += values[i++];
+        } while (values[i] != ',');
+        ++i;
+        if (!JsonValidator::isFloatingPoint(readed))
+        {
+            return false;
+        }
+        readed = "";
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is a number array
+/// @param json the definite json string
+/// @return true if the definite json string is a number array and false if not
+/// @author Petya Licheva - pety02 
+bool JsonValidator::isNumbersArray(const std::string& json)
+{
+    return JsonValidator::isIntegersArray(json) || JsonValidator::isFloatingPointsArray(json);
+}
+
+/// @brief validates the json string is a date array
+/// @param json the definite json string
+/// @return true if the definite json string is a date array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isDatesArray(const std::string& json)
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    std::string readed = "";
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (values[i] == ' ')
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed += values[i++];
+        } while (values[i] != ',');
+        ++i;
+        if (!JsonValidator::isDate(readed))
+        {
+            return false;
+        }
+        readed = "";
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is an objects array
+/// @param json the definite json string
+/// @return true if the definite json string is an objects array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isObjectsArray(const std::string& json) 
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    char *readed = new char[values.length()];
+    unsigned int readFrom = 0;
+    for (unsigned int i = 0; i < values.length();)
+    {
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed[readFrom++] = values[i++];
+        } while (values[i] != ',');
+        std::string readedAsString = readed;
+        if (!JsonValidator::isObject(readedAsString) && readedAsString != "null")
+        {
+            return false;
+        }
+        readed = new char[values.length()];
+        readFrom = 0;
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is a string array
+/// @param json the definite json string
+/// @return true if the definite json string is a string array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isStringsArray(const std::string& json)
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    char *readed = new char[values.length()];
+    unsigned int readFrom = 0;
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (values[i] == ' ')
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed[readFrom++] = values[i++];
+        } while (values[i] != ',');
+        ++i;
+        if (readed[0] != '\"' || readed[readFrom - 1] != '\"')
+        {
+            return false;
+        }
+        readed = new char[values.length()];
+        readFrom = 0;
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is a boolean array
+/// @param json the definite json string
+/// @return true if the definite json string is a boolean array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isBooleansArray(const std::string& json)
+{
+    if (json[0] != '[' || json[json.length() - 1] != ']')
+    {
+        return false;
+    }
+    unsigned int size = json.length();
+    std::string values = json.substr(1, size - 2);
+    std::string readed = "";
+    for (unsigned int i = 0; i < values.length();)
+    {
+        while (!JsonValidator::isLetter(json[i]))
+        {
+            i++;
+        }
+        do
+        {
+            if (values[i] == '\0')
+            {
+                break;
+            }
+            readed += values[i++];
+        } while (values[i] != ',');
+        i++;
+        if (readed != "true" && readed != "false")
+        {
+            return false;
+        }
+        readed = "";
+    }
+
+    return true;
+}
+
+/// @brief validates the json string is an array
+/// @param json the definite json string
+/// @return true if the definite json string is an array and false if not
+/// @author Petya Licheva - pety02
+bool JsonValidator::isArray(const std::string& json) 
+{
+    return JsonValidator::isNumbersArray(json) 
+        || JsonValidator::isStringsArray(json) 
+        || JsonValidator::isBooleansArray(json) 
+        || JsonValidator::isObjectsArray(json)
+        || JsonValidator::isDatesArray(json);
 }
