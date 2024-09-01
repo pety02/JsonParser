@@ -47,6 +47,7 @@ bool JsonValidator::isLetter(char c)
 /// @author Petya Licheva - pety02
 bool JsonValidator::validateCurlyBraces(const std::string& json)
 {
+    // Here std::vector is used as std::stack
     std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
@@ -79,6 +80,7 @@ bool JsonValidator::validateCurlyBraces(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::validateStraightBraces(const std::string& json)
 {
+    // Here std::vector is used as std::stack
     std::vector<char> braces = std::vector<char>();
     char firstBrace = ' ';
 
@@ -267,12 +269,12 @@ bool JsonValidator::isDate(const std::string& json)
             return false;
         }
         if((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) 
-            && (date < 1 || 31 < date)) { 
+            && (date < 1 || 31 < date)) { // 31 days months
             return false;
         } else if((month == 4 || month == 6 || month == 9 || month == 11) 
-            && (date < 1 || 30 < date)) { 
+            && (date < 1 || 30 < date)) { // 30 days months
             return false;
-        } else {
+        } else { // special case of February
             if(year % 4 == 0 || year % 400 == 0) { // leap year
                 if(month == 2 && (date < 1 || 29 < date)) {
                     return false;
@@ -316,10 +318,13 @@ bool JsonValidator::isObject(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::validateKeys(const std::string& json) 
 {
+    // empty string 
     if (json.empty())
     {
         return false;
     }
+
+    // valid emprty json object
     if(json.length() == 2 && json[0] == '{' && json[1] == '}') {
         return true;
     }
@@ -343,6 +348,7 @@ bool JsonValidator::validateKeys(const std::string& json)
                 key += json[i++];
             } while (json[i] != ':');
             
+            // chacks if all keys of not empty a json object is in inverted commas
             if(key[0] == '\"' && key[key.length() - 1] == '\"') {
                 isValid = true;
             } else {
@@ -369,9 +375,12 @@ bool JsonValidator::validateKeys(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::validateValues(const std::string& json)
 {
+    // empty string
     if(json.empty()) {
         return false;
     }
+
+    // valid empty json object 
     if(json.length() == 2 && json[0] == '{' && json[1] == '}') {
         return true;
     }
@@ -413,6 +422,7 @@ bool JsonValidator::validateValues(const std::string& json)
                 hasArray = false;
             }
             
+            // checks if the json object's value is valid value or not
             if((value[0] == '\"' && value[value.length() - 1] == '\"') 
                 || JsonValidator::isInteger(value) 
                 || JsonValidator::isFloatingPoint(value) || value == "null" 
@@ -445,10 +455,13 @@ bool JsonValidator::validateValues(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::validateSeparators(const std::string& json) 
 {
+    // empty string
     if (json.empty())
     {
         return false;
     }
+
+    // valid emprty json object
     if(json.length() == 2 && json[0] == '{' && json[1] == '}') {
         return true;
     }
@@ -480,7 +493,7 @@ bool JsonValidator::validateSeparators(const std::string& json)
             }
             if(!hasArray) {
                 while(json[i] != ',') {
-                    if(i == json.length()) {
+                    if(i == json.length() - 2) {
                         break;
                     }
                     i++;
@@ -500,6 +513,7 @@ bool JsonValidator::validateSeparators(const std::string& json)
         } 
     }
 
+    // checks if the separators count is valid or not in comparison with key-value pairs count
     return separatorsCount + 1 == keyValuePairsCount || keyValuePairsCount == separatorsCount;
 }
 
@@ -509,10 +523,12 @@ bool JsonValidator::validateSeparators(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isIntegersArray(const std::string& json) 
 {
+    // checks if the array starts with '[' and ends with ']' 
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
     }
+
     unsigned int size = json.length();
     std::string values = json.substr(1, size - 2);
     std::string readed = "";
@@ -531,6 +547,7 @@ bool JsonValidator::isIntegersArray(const std::string& json)
             readed += values[i++];
         } while (values[i] != ',');
         ++i;
+        // checks if every read number is an integer
         if (json[i] != '-' && !JsonValidator::isInteger(readed))
         {
             return false;
@@ -547,6 +564,7 @@ bool JsonValidator::isIntegersArray(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isFloatingPointsArray(const std::string& json) 
 {
+    // checks if the array starts with '[' and ends with ']' 
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
@@ -569,6 +587,7 @@ bool JsonValidator::isFloatingPointsArray(const std::string& json)
             readed += values[i++];
         } while (values[i] != ',');
         ++i;
+        // check if every read number is a floating point
         if (!JsonValidator::isFloatingPoint(readed))
         {
             return false;
@@ -594,6 +613,7 @@ bool JsonValidator::isNumbersArray(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isDatesArray(const std::string& json)
 {
+    // checks if the array starts with '[' and ends with ']'
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
@@ -616,6 +636,7 @@ bool JsonValidator::isDatesArray(const std::string& json)
             readed += values[i++];
         } while (values[i] != ',');
         ++i;
+        // checks if every read value is a date
         if (!JsonValidator::isDate(readed))
         {
             return false;
@@ -632,6 +653,7 @@ bool JsonValidator::isDatesArray(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isObjectsArray(const std::string& json) 
 {
+    // checks if the array starts with '[' and ends with ']'
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
@@ -651,6 +673,7 @@ bool JsonValidator::isObjectsArray(const std::string& json)
             readed[readFrom++] = values[i++];
         } while (values[i] != ',');
         std::string readedAsString = readed;
+        // checks if every read value is a valid json object
         if (!JsonValidator::isObject(readedAsString) && readedAsString != "null")
         {
             return false;
@@ -668,6 +691,7 @@ bool JsonValidator::isObjectsArray(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isStringsArray(const std::string& json)
 {
+    // checks if the array starts with '[' and ends with ']'
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
@@ -691,6 +715,7 @@ bool JsonValidator::isStringsArray(const std::string& json)
             readed[readFrom++] = values[i++];
         } while (values[i] != ',');
         ++i;
+        // checks if every read value starts and ends with '\"'
         if (readed[0] != '\"' || readed[readFrom - 1] != '\"')
         {
             return false;
@@ -708,6 +733,7 @@ bool JsonValidator::isStringsArray(const std::string& json)
 /// @author Petya Licheva - pety02
 bool JsonValidator::isBooleansArray(const std::string& json)
 {
+    // checks if the array starts with '[' and ends with ']'
     if (json[0] != '[' || json[json.length() - 1] != ']')
     {
         return false;
@@ -730,6 +756,7 @@ bool JsonValidator::isBooleansArray(const std::string& json)
             readed += values[i++];
         } while (values[i] != ',');
         i++;
+        // checks if evry read value is "true" or "false"
         if (readed != "true" && readed != "false")
         {
             return false;
