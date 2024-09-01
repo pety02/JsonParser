@@ -28,8 +28,8 @@ private:
 public:
     JsonParser(); // works
     JsonParser(const JsonObject&); // works
-    JsonParser(JsonParser&&) noexcept; // works  
     JsonParser(const JsonParser&); // works
+    JsonParser(JsonParser&&) noexcept; // works  
     JsonParser &operator=(const JsonParser&); // works
     JsonParser &operator=(JsonParser&&) noexcept; // works
     ~JsonParser(); // works
