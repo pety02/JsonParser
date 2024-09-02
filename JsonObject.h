@@ -30,6 +30,7 @@ public:
     friend bool operator==(const JsonObject&, const JsonObject&);
     friend bool operator!=(const JsonObject &, const JsonObject&);
 
+    void setValue(const std::string&);
     void setNext(const JsonObject&);
     void add(const JsonObject&);
     void remove(const JsonObject&);

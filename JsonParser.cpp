@@ -420,6 +420,47 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
     return newNode;
 }
 
+/// @brief 
+/// @param  
+/// @param  
+/// @return 
+std::vector<std::string> JsonParser::splitBy(char c, const std::string &str)
+{
+    std::vector<std::string> vals = std::vector<std::string>();
+    std::string currValue = "";
+    for(int i = 0; i < str.length(); ++i) {
+        if(str[i] == c) {
+            vals.push_back(currValue);
+            currValue = "";
+            continue;
+        }
+        currValue += str[i];
+    }
+
+    return vals;
+}
+
+/// @brief 
+/// @param  
+/// @param  
+/// @return
+/// @author 
+JsonObject *JsonParser::findBy(const std::string &key, JsonObject *root)
+{   
+    JsonObject* value = nullptr;
+    JsonObject* temp = root;
+    while(temp) {
+        if(temp->getKey() == key) {
+            JsonValueType currentType = this->getType(temp->getValue());
+            value = new JsonObject(currentType, temp->getKey(), temp->getValue(), std::vector<JsonObject*>(), temp->getNext());
+            break;
+        }
+        temp = temp->getNext();
+    }
+
+    return value; 
+}
+
 /// @brief Default constructor of JsonParser class
 /// @author Petya Licheva - pety02
 JsonParser::JsonParser()
@@ -535,7 +576,7 @@ void JsonParser::print(std::ostream& out) const
               << "}";
 }
 
-/// @brief a methot that searches JsonObjects by a definite key
+/// @brief a method that searches JsonObjects by a definite key
 /// @param key the definite key
 /// @return a vector of found JsonObjects
 /// @author Petya Licheva - pety02
@@ -568,29 +609,30 @@ bool JsonParser::contains(std::string value) const
 /// @param json the JsonObject as string
 /// @throw std::runtime_error with a custom message if the path is not found
 /// @author Petya Licheva - pety02
-void JsonParser::setTo(const std::string &path, const std::string &json)
+void JsonParser::setTo(const std::string &path, const std::string &value)
 {
-    JsonObject* pathObj = this->createFromJsonString(path);
-    JsonObject* readPathObj = pathObj;
-    JsonObject* readRootObj = this->root;
-    while(readPathObj->getNext() != nullptr && readRootObj->getNext() != nullptr) {
-        if(readPathObj->getType() != readRootObj->getType() 
-            || readPathObj->getKey() != readRootObj->getKey() 
-            || readPathObj->getValue() != readRootObj->getValue()) {
-            throw std::runtime_error("Path not found!");
-        } 
-        readPathObj = readPathObj->getNext();
-        readRootObj = readRootObj->getNext();
+    if(!JsonValidator::isInteger(value) && !JsonValidator::isFloatingPoint(value) && !JsonValidator::isDate(value) 
+        && !JsonValidator::isArray(value) && !JsonValidator::isObject(value) && value != "true" && value != "false") {
+            throw std::invalid_argument("Invalid value!");
+    }
+    std::vector<std::string> keys = this->splitBy('/', path);
+    JsonObject* obj = this->findBy(keys[0], this->root);
+    for(int i = 1; i < keys.size(); ++i) {
+        JsonObject* obj2 = this->findBy(keys[i], obj);
+        if(obj != obj2) {
+            obj = obj2;
+        }
     }
 
-    JsonObject* newJsonObj = this->createFromJsonString(json);
-    readRootObj->setNext(*newJsonObj);
+    obj->setValue(value);
 }
 
 /// @brief 
-/// @param json 
+/// @param 
+/// @param
+/// @throw
 /// @author Petya Licheva - pety02
-void JsonParser::createPath(const std::string& json)
+void JsonParser::createPath(const std::string& path, const std::string& json)
 {
     
 }

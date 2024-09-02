@@ -142,6 +142,14 @@ bool operator!=(const JsonObject &left, const JsonObject &right)
     return left.key != right.key && left.value != right.value;
 }
 
+/// @brief
+/// @param value
+/// @author
+void JsonObject::setValue(const std::string &value)
+{
+    this->value = value;
+}
+
 /// @brief a method that sets the next JsonObject
 /// @param newNext the new next JsonObject
 /// @author Petya Licheva - pety02

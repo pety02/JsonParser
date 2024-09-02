@@ -25,6 +25,8 @@ private:
     void printNode(JsonObject*, int&, std::ostream&) const; // works
     bool containsHelper(const std::string, JsonObject*) const; // works
     JsonObject* createFromJsonString(std::string); // works
+    std::vector<std::string> splitBy(char, const std::string&);
+    JsonObject* findBy(const std::string&, JsonObject*);
 public:
     JsonParser(); // works
     JsonParser(const JsonObject&); // works
@@ -38,8 +40,8 @@ public:
     void print(std::ostream&) const; // works
     std::vector<JsonObject*> searchBy(const std::string&) const; // works
     bool contains(std::string) const; // works
-    void setTo(const std::string&, const std::string&); // works
-    void createPath(const std::string&); // TODO: to implment it
+    void setTo(const std::string&, const std::string&); // updated - needs to be tested
+    void createPath(const std::string&, const std::string&); // TODO: to implment it
     void deletePath(const std::string&); // TODO: to implment it
     void move(const std::string&, std::string&); // TODO: to implment it
     void open(std::string); // works
