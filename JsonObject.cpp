@@ -142,12 +142,20 @@ bool operator!=(const JsonObject &left, const JsonObject &right)
     return left.key != right.key && left.value != right.value;
 }
 
-/// @brief
-/// @param value
-/// @author
+/// @brief a method that sets a value of the JsonObject
+/// @param value the new value of the current JsonObject
+/// @author Petya Licheva - pety02
 void JsonObject::setValue(const std::string &value)
 {
     this->value = value;
+}
+
+/// @brief a method that sets the children of the JsonObject
+/// @param children the new children of the current JsonObject
+/// @author Petya Licheva - pety02
+void JsonObject::setChildren(const std::vector<JsonObject *> &children)
+{
+    this->children = children;
 }
 
 /// @brief a method that sets the next JsonObject

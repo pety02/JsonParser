@@ -26,7 +26,7 @@ private:
     bool containsHelper(const std::string, JsonObject*) const; // works
     JsonObject* createFromJsonString(std::string); // works
     std::vector<std::string> splitBy(char, const std::string&);
-    JsonObject* findBy(const std::string&, JsonObject*);
+    JsonObject* findBy(const std::string&, JsonObject*, int);
 public:
     JsonParser(); // works
     JsonParser(const JsonObject&); // works
@@ -40,7 +40,7 @@ public:
     void print(std::ostream&) const; // works
     std::vector<JsonObject*> searchBy(const std::string&) const; // works
     bool contains(std::string) const; // works
-    void setTo(const std::string&, const std::string&); // updated - needs to be tested
+    void setTo(const std::string&, const std::string&); // works
     void createPath(const std::string&, const std::string&); // TODO: to implment it
     void deletePath(const std::string&); // TODO: to implment it
     void move(const std::string&, std::string&); // TODO: to implment it

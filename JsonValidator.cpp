@@ -312,6 +312,15 @@ bool JsonValidator::isObject(const std::string& json)
     return isValid;
 }
 
+/// @brief 
+/// @param json 
+/// @return 
+/// @author
+bool JsonValidator::isString(const std::string &json)
+{
+    return json[0] == '\"' && json[json.length() - 1] == '\"';
+}
+
 /// @brief validates all keys in the json string are valid
 /// @param json the definite json string
 /// @return true if the all keys in the json string are valid and false if not

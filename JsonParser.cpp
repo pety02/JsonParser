@@ -313,27 +313,21 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
             }
             if(allData[i] == '{') {
                 currentType = JsonValueType::OBJECT_ARRAY;
-                hasChildren = true;
                 std::vector<JsonObject*> objects = std::vector<JsonObject*>();
                 while(allData[i] != ']') {
                     if(allData[i] == '}') {
                         currValue += allData[i];
                         JsonObject* currentObject = this->createFromJsonString(currValue);
-                        
+                    
                         objects.push_back(currentObject);
                         currValue = "";
                         i++;
-                        while(allData[i] != '{') {
-                            if(i == allData.length()) {
-                                break;
-                            }
+                        while(allData[i] != '{' && allData[i] != ']') {
                             i++;
                         }
+                    } else {
+                        currValue += allData[i++];
                     }
-                    if(i == allData.length()) {
-                        break;
-                    }
-                    currValue += allData[i++];
                 }
                 objsVecs.push_back(objects);
                 currObjsValues.push_back(currObjValues);
@@ -420,16 +414,17 @@ JsonObject* JsonParser::createFromJsonString(std::string allData)
     return newNode;
 }
 
-/// @brief 
-/// @param  
-/// @param  
-/// @return 
-std::vector<std::string> JsonParser::splitBy(char c, const std::string &str)
+/// @brief a method that splits a string by definite separator
+/// @param sep the definite separator 
+/// @param str the definite string
+/// @return a vector of splitted substrings
+/// @author Petya Licheva - pety02
+std::vector<std::string> JsonParser::splitBy(char sep, const std::string &str)
 {
     std::vector<std::string> vals = std::vector<std::string>();
     std::string currValue = "";
-    for(int i = 0; i < str.length(); ++i) {
-        if(str[i] == c) {
+    for(int i = 0; i <= str.length(); ++i) {
+        if(str[i] == sep || str[i] == '\0') {
             vals.push_back(currValue);
             currValue = "";
             continue;
@@ -440,24 +435,25 @@ std::vector<std::string> JsonParser::splitBy(char c, const std::string &str)
     return vals;
 }
 
-/// @brief 
-/// @param  
-/// @param  
-/// @return
-/// @author 
-JsonObject *JsonParser::findBy(const std::string &key, JsonObject *root)
+/// @brief a method that finds json subobjects by a definite key in a definite JsonObject 
+/// @param key a definite key
+/// @param root a definite root JsonObject's pointer
+/// @param index a definite index (nesting level)
+/// @return a pointer to the found JsonObject
+/// @author Petya Licheva - pety02
+JsonObject *JsonParser::findBy(const std::string &key, JsonObject *root, int index = 0)
 {   
     JsonObject* value = nullptr;
     JsonObject* temp = root;
     while(temp) {
         if(temp->getKey() == key) {
-            JsonValueType currentType = this->getType(temp->getValue());
-            value = new JsonObject(currentType, temp->getKey(), temp->getValue(), std::vector<JsonObject*>(), temp->getNext());
+            JsonValueType currentType = temp->getType();
+            value = new JsonObject(currentType, temp->getKey(), temp->getValue(), temp->getChildren(), temp->getNext());
             break;
         }
         temp = temp->getNext();
     }
-
+   
     return value; 
 }
 
@@ -611,20 +607,84 @@ bool JsonParser::contains(std::string value) const
 /// @author Petya Licheva - pety02
 void JsonParser::setTo(const std::string &path, const std::string &value)
 {
+    // TODO: to think if I have an array of objects how to identify in which object to add the given value
     if(!JsonValidator::isInteger(value) && !JsonValidator::isFloatingPoint(value) && !JsonValidator::isDate(value) 
-        && !JsonValidator::isArray(value) && !JsonValidator::isObject(value) && value != "true" && value != "false") {
+        && !JsonValidator::isArray(value) && !JsonValidator::isObject(value) && value != "true" && value != "false" 
+        && !JsonValidator::isString(value)) {
             throw std::invalid_argument("Invalid value!");
     }
+    
     std::vector<std::string> keys = this->splitBy('/', path);
+    for(int i = 0; i < keys.size(); ++i) {
+        std::cout << "Key " << i + 1 << ": " << keys[i] << std::endl;
+    }
+
     JsonObject* obj = this->findBy(keys[0], this->root);
+    int index = 0;
+
+    JsonObject* temp = nullptr;
     for(int i = 1; i < keys.size(); ++i) {
-        JsonObject* obj2 = this->findBy(keys[i], obj);
+        JsonObject* obj2 = nullptr;
+        if(obj->getNext() != nullptr) {
+            obj2 = this->findBy(keys[i], obj);
+        } else {
+            obj2 = this->findBy(keys[i], obj->getChildren()[index]);
+            index++;
+        }
+
+        if(temp == nullptr) {
+            temp = new JsonObject(*obj2);
+        } else {
+            temp->setNext(*obj2);
+        }
+        temp = temp->getNext();
+
         if(obj != obj2) {
             obj = obj2;
         }
     }
 
     obj->setValue(value);
+    JsonObject* rootTemp = this->root;
+    JsonObject* newRoot = nullptr;
+    JsonObject* newNode = new JsonObject(rootTemp->getType(), rootTemp->getKey(), rootTemp->getValue(), rootTemp->getChildren(), rootTemp->getNext());
+    if(newRoot == nullptr) {
+        this->root = newNode;
+        newRoot = this->root;
+        rootTemp = rootTemp->getNext();
+    } else {
+        newRoot->setNext(*newNode);
+        newRoot = newRoot->getNext();
+        rootTemp = rootTemp->getNext();
+    }
+    while(rootTemp != nullptr) {
+        newNode = new JsonObject(rootTemp->getType(), rootTemp->getKey(), rootTemp->getValue(), rootTemp->getChildren(), rootTemp->getNext());
+        if(rootTemp->getKey() == obj->getKey()) {
+            newRoot->setNext(*obj);
+        } else if(rootTemp->getType() == JsonValueType::OBJECT || rootTemp->getType() == JsonValueType::OBJECT_ARRAY) {
+            bool isBroken = false;
+            for(int i = 0; i < rootTemp->getChildren().size(); ++i) {
+                JsonObject* currObj = rootTemp->getChildren()[i];
+                while(currObj != nullptr) {
+                    if(currObj->getKey() == obj->getKey()) {
+                        currObj->setValue(obj->getValue());
+                        rootTemp->getChildren()[i] = currObj;
+                        isBroken = true;
+                        break;
+                    }
+                    currObj = currObj->getNext();
+                }
+                if(isBroken) {
+                    break;
+                }
+            }
+        } else {
+            newRoot->setNext(*newNode);
+        }
+
+        newRoot = newRoot->getNext();
+        rootTemp = rootTemp->getNext();
+    }
 }
 
 /// @brief 

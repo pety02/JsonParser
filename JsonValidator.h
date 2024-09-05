@@ -35,8 +35,9 @@ public:
     static bool isISODateFormat(const std::string&);
     static bool isUSADateFormat(const std::string&);
     static bool isEURDateFormat(const std::string&);
-    static bool isDate(const std::string&);
+    static bool isDate(const std::string&); 
     static bool isObject(const std::string&);
+    static bool isString(const std::string&);
 
     static bool validateKeys(const std::string&);
     static bool validateValues(const std::string&);

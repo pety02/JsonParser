@@ -31,6 +31,7 @@ public:
     friend bool operator!=(const JsonObject &, const JsonObject&);
 
     void setValue(const std::string&);
+    void setChildren(const std::vector<JsonObject*>&);
     void setNext(const JsonObject&);
     void add(const JsonObject&);
     void remove(const JsonObject&);
